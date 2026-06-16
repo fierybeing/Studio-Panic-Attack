@@ -1,4 +1,5 @@
-import { useFrame, ThreeEvent } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
+import type { ThreeEvent } from '@react-three/fiber';
 import { MeshReflectorMaterial, Text, Html, useCursor, useTexture, ContactShadows } from '@react-three/drei';
 import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -562,7 +563,7 @@ class SlotErrorBoundary extends Component<SlotErrorBoundaryProps, SlotErrorBound
 // still drive scale, position.y, and material colour imperatively.
 interface SlotInnerProps {
   texUrl: string;
-  meshRef: React.RefObject<THREE.Mesh>;
+  meshRef: React.RefObject<THREE.Mesh | null>;
   clampedW: number;
   clampedH: number;
   boxDepth: number;
