@@ -2,6 +2,10 @@
 
 All notable changes to Studio Panic Attack are tracked here.
 
+## [1.2.32] -- gallery: fix crash on fast carousel drag
+
+- `src/components/Gallery/Gallery.tsx`: extracted `useTexture` into a new `SlotInner` child component, isolated inside `<SlotErrorBoundary resetKey={currentTexUrl}> + <Suspense fallback={null}>`. Fast dragging caused texture loads to abort mid-flight; THREE fired onError with undefined message; useTexture threw past Suspense (errors != promises); R3F lost WebGL context. Error boundary swallows load errors silently; resetKey={currentTexUrl} auto-resets when the slot moves to a new image. Added ThreeEvent import for pointer/click event typing. meshRef defined in CarouselSlot and forwarded so useFrame still drives scale, position.y, and material colour imperatively.
+
 ## [1.2.31] -- typography: Quiet-Attempt font for all page headers
 
 - `src/styles/whiteboard-pages.css`: `spa-about__title` — add `white-space: nowrap` and loosen `letter-spacing` to `-0.02em` (Quiet-Attempt wider than prev display font; ABOUT was wrapping to two lines).

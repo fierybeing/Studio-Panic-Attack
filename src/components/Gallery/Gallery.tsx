@@ -1,6 +1,7 @@
-import { useFrame } from '@react-three/fiber';
+import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { MeshReflectorMaterial, Text, Html, useCursor, useTexture, ContactShadows } from '@react-three/drei';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import * as THREE from 'three';
 
 import { getSectionWorldY } from '../../config/sections';
@@ -492,14 +493,10 @@ export function Gallery() {
           </>
         )}
 
-        {/* Slots — each renders the asset currently assigned to it.
-            Per-slot Suspense keeps texture loads local: if a slot's texture
-            isn't cached yet, only that slot is null while it resolves —
-            never the whole scene. */}
+        {/* Slots — Suspense + ErrorBoundary live inside CarouselSlot so
+            each slot isolates its own texture load/error independently. */}
         {slots.current.map((_s, i) => (
-          <Suspense key={i} fallback={null}>
-            <CarouselSlot slotIndex={i} slots={slots} />
-          </Suspense>
+          <CarouselSlot key={i} slotIndex={i} slots={slots} />
         ))}
       </group>
 
@@ -525,6 +522,88 @@ export function Gallery() {
   );
 }
 
+// ── SlotErrorBoundary ─────────────────────────────────────────────────────
+// Catches "Could not load <url>: undefined" errors thrown by useTexture when
+// a texture fails mid-flight (network abort, race condition on fast drag).
+// Keyed on the current texUrl so it auto-resets whenever the slot moves to
+// a new image — the old errored state is discarded and the fresh URL gets a
+// clean boundary.
+interface SlotErrorBoundaryProps { children: ReactNode; resetKey: string; }
+interface SlotErrorBoundaryState { hasError: boolean; }
+
+class SlotErrorBoundary extends Component<SlotErrorBoundaryProps, SlotErrorBoundaryState> {
+  state: SlotErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): SlotErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidUpdate(prev: SlotErrorBoundaryProps) {
+    // New image assigned → clear the error so the next load gets a fresh try.
+    if (prev.resetKey !== this.props.resetKey && this.state.hasError) {
+      this.setState({ hasError: false });
+    }
+  }
+
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
+// ── SlotInner ─────────────────────────────────────────────────────────────
+// Isolated component that owns the single `useTexture` call for one slot.
+// Lives inside <Suspense> + <SlotErrorBoundary> so that:
+//   • A pending load suspends only this component (shows null via fallback).
+//   • A failed load (Error) is caught by SlotErrorBoundary, not propagated
+//     to R3F's root, avoiding the "Context Lost" crash on fast dragging.
+//
+// `meshRef` is forwarded from CarouselSlot so the parent's useFrame can
+// still drive scale, position.y, and material colour imperatively.
+interface SlotInnerProps {
+  texUrl: string;
+  meshRef: React.RefObject<THREE.Mesh>;
+  clampedW: number;
+  clampedH: number;
+  boxDepth: number;
+  onPointerOver: (e: ThreeEvent<PointerEvent>) => void;
+  onPointerOut: () => void;
+  onClick: (e: ThreeEvent<MouseEvent>) => void;
+  onTextureLoaded: (aspect: number) => void;
+}
+
+function SlotInner({
+  texUrl, meshRef, clampedW, clampedH, boxDepth,
+  onPointerOver, onPointerOut, onClick, onTextureLoaded,
+}: SlotInnerProps) {
+  const texture = useTexture(texUrl);
+
+  // Correct aspect ratio from intrinsic texture dimensions once loaded.
+  useEffect(() => {
+    const img = texture?.image as HTMLImageElement | undefined;
+    if (!img) return;
+    const w = img.naturalWidth ?? img.width ?? 0;
+    const h = img.naturalHeight ?? img.height ?? 0;
+    if (w > 0 && h > 0) onTextureLoaded(w / h);
+  }, [texture, onTextureLoaded]);
+
+  return (
+    <mesh
+      ref={meshRef}
+      onPointerOver={onPointerOver}
+      onPointerOut={onPointerOut}
+      onClick={onClick}
+      scale={[clampedW, clampedH, boxDepth]}
+      position={[0, clampedH / 2, 0]}
+    >
+      <boxGeometry />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
+}
+
+// ── CarouselSlot ──────────────────────────────────────────────────────────
+
 interface CarouselSlotProps {
   slotIndex: number;
   slots: React.MutableRefObject<SlotState[]>;
@@ -534,29 +613,20 @@ function CarouselSlot({ slotIndex, slots }: CarouselSlotProps) {
   const [hover, setHover] = useState(false);
   useCursor(hover);
   const groupRef = useRef<THREE.Group>(null);
-  const boxRef = useRef<THREE.Mesh>(null);
+  // meshRef is defined here so useFrame can drive it imperatively even
+  // though the mesh itself lives in the SlotInner child.
+  const meshRef = useRef<THREE.Mesh>(null);
   const hoverScale = useRef(1);
 
   const slot = slots.current[slotIndex];
-  // The texUrl points at the .1080.webp variant. clickUrl points at the
-  // .1920.webp variant — still WebP (cheap to decode in the lightbox) but
-  // ample fidelity for fullscreen viewing. The lightbox's projectFromUrl
-  // helper resolves the project from the folder segment of either, so the
-  // "View project" pill works regardless of suffix.
+  // texUrl → .1080.webp (cheap decode for THREE).
+  // clickUrl → .1920.webp (full-fidelity for lightbox).
   const [currentTexUrl, setCurrentTexUrl] = useState(slot.texUrl);
   const [clickUrl, setClickUrl] = useState(() => pickOptimized(slot.asset.url, 1920));
-  const texture = useTexture(currentTexUrl);
 
-  // Initial aspect from manifest metadata; corrected to the texture's
-  // intrinsic dimensions once it has loaded.
+  // Initial aspect from manifest; corrected once texture intrinsic dims are
+  // known (via onTextureLoaded callback from SlotInner).
   const [aspect, setAspect] = useState(() => slot.asset.aspect);
-  useEffect(() => {
-    const img = texture?.image as HTMLImageElement | undefined;
-    if (!img) return;
-    const w = img.naturalWidth ?? img.width ?? 0;
-    const h = img.naturalHeight ?? img.height ?? 0;
-    if (w > 0 && h > 0) setAspect(w / h);
-  }, [texture]);
 
   const sizeMultiplier = useMemo(() => 0.55 + Math.random() * 1.1, []);
 
@@ -574,8 +644,11 @@ function CarouselSlot({ slotIndex, slots }: CarouselSlotProps) {
 
   useFrame((state, dt) => {
     const s = slots.current[slotIndex];
-    if (!groupRef.current || !boxRef.current) return;
+    if (!groupRef.current) return;
 
+    // Slot wrapped to a new image — update React state so SlotInner
+    // re-renders with the new URL. The SlotErrorBoundary resets via its
+    // resetKey (= currentTexUrl), giving the new URL a clean boundary.
     if (s.texUrl !== currentTexUrl) {
       setCurrentTexUrl(s.texUrl);
       setClickUrl(pickOptimized(s.asset.url, 1920));
@@ -592,6 +665,8 @@ function CarouselSlot({ slotIndex, slots }: CarouselSlotProps) {
     // Pointer tilt
     groupRef.current.rotation.y = -angle + state.pointer.x * 0.20;
 
+    if (!meshRef.current) return;
+
     // Depth dimming — map z ∈ [-28, -2] onto [0.45, 1.0]
     const z = groupRef.current.position.z;
     const depthFactor = THREE.MathUtils.lerp(
@@ -604,28 +679,36 @@ function CarouselSlot({ slotIndex, slots }: CarouselSlotProps) {
     const targetScale = hover ? 1.05 : 1;
     hoverScale.current += (targetScale - hoverScale.current) * Math.min(1, 8 * dt);
     const hs = hoverScale.current;
-    boxRef.current.scale.set(clampedW * hs, clampedH * hs, boxDepth * hs);
-    boxRef.current.position.y = (clampedH * hs) / 2;
+    meshRef.current.scale.set(clampedW * hs, clampedH * hs, boxDepth * hs);
+    meshRef.current.position.y = (clampedH * hs) / 2;
 
     // Tint: depth dimming + hover brightness
-    const mat = boxRef.current.material as THREE.MeshBasicMaterial;
-    const brightness = hover ? Math.min(1, depthFactor * 1.15) : depthFactor;
-    mat.color.setRGB(brightness, brightness, brightness);
+    const mat = meshRef.current.material as THREE.MeshBasicMaterial;
+    if (mat?.color) {
+      const brightness = hover ? Math.min(1, depthFactor * 1.15) : depthFactor;
+      mat.color.setRGB(brightness, brightness, brightness);
+    }
   });
 
   return (
     <group ref={groupRef}>
-      <mesh
-        ref={boxRef}
-        onPointerOver={(e) => { e.stopPropagation(); setHover(true); }}
-        onPointerOut={() => setHover(false)}
-        onClick={(e) => { e.stopPropagation(); openLightbox(clickUrl); }}
-        scale={[clampedW, clampedH, boxDepth]}
-        position={[0, clampedH / 2, 0]}
-      >
-        <boxGeometry />
-        <meshBasicMaterial map={texture} toneMapped={false} />
-      </mesh>
+      {/* SlotErrorBoundary key=currentTexUrl → auto-resets on URL change,
+          so a failed load never leaves the slot permanently blank. */}
+      <SlotErrorBoundary resetKey={currentTexUrl}>
+        <Suspense fallback={null}>
+          <SlotInner
+            texUrl={currentTexUrl}
+            meshRef={meshRef}
+            clampedW={clampedW}
+            clampedH={clampedH}
+            boxDepth={boxDepth}
+            onPointerOver={(e) => { e.stopPropagation(); setHover(true); }}
+            onPointerOut={() => setHover(false)}
+            onClick={(e) => { e.stopPropagation(); openLightbox(clickUrl); }}
+            onTextureLoaded={setAspect}
+          />
+        </Suspense>
+      </SlotErrorBoundary>
     </group>
   );
 }
