@@ -108,10 +108,10 @@ body[data-view="home"] .view, body[data-view="projects"] .view { height: 100vh; 
 .foot a:hover { color: var(--ultra); }
 
 /* ── HOME: the orbit ────────────────────────────────────────────────────── */
-.orbit { position: relative; height: 100%; overflow: hidden; }
+.orbit { position: relative; height: 100%; overflow: hidden; -webkit-user-select: none; user-select: none; }
 .orbit__intro { position: absolute; left: 28px; top: 26px; z-index: 210; pointer-events: none; }
 .orbit__sub { margin-top: 8px; max-width: 200px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; line-height: 1.7; color: var(--faint); }
-.orbit__cloud { position: absolute; inset: 0; touch-action: pan-y; cursor: grab; }
+.orbit__cloud { position: absolute; inset: 0; touch-action: none; cursor: grab; }
 .orbit__cloud:active { cursor: grabbing; }
 .orbit__item { position: absolute; left: 0; top: 0; width: 150px; will-change: transform, opacity; transition: opacity 0.3s; cursor: pointer; }
 .orbit__pic { display: block; overflow: hidden; background: #f0f0f0; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); }

@@ -10,12 +10,18 @@
   SPA.views.home = function () {
     var works = C.home.works.filter(function (w) { return SPA.info(w.img); });
     var cloud = h('div.orbit__cloud', { 'aria-label': 'Selected work image cloud' });
-    var status = h('span', 'Select an image to focus · drag to spin');
+    var status = h('span', 'Select an image to focus · drag any way to spin');
     var caption = h('div.orbit__caption', { hidden: true, 'aria-live': 'polite' });
     var crumb = h('p.orbit__crumb', { hidden: true });
     var el;
     var golden = Math.PI * (3 - Math.sqrt(5));
-    var rotation = 0, spin = 0.00016, selected = -1, raf = 0, last = performance.now();
+    var spin = 0.00016, selected = -1, raf = 0, last = performance.now();
+    /* The sphere's orientation is a 3x3 rotation matrix, so it can turn in every direction. */
+    var R = [1, 0, 0, 0, 1, 0, 0, 0, 1], vx = 0, vy = 0;
+    function turnY(a) { var c = Math.cos(a), s = Math.sin(a), i, p, q;
+      for (i = 0; i < 3; i++) { p = R[i]; q = R[6 + i]; R[i] = c * p + s * q; R[6 + i] = -s * p + c * q; } }
+    function turnX(a) { var c = Math.cos(a), s = Math.sin(a), i, p, q;
+      for (i = 0; i < 3; i++) { p = R[3 + i]; q = R[6 + i]; R[3 + i] = c * p - s * q; R[6 + i] = s * p + c * q; } }
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     var nodes = works.map(function (w, i) {
@@ -59,7 +65,7 @@
         crumb.appendChild(document.createTextNode(' / '));
         crumb.appendChild(h('a', { href: href }, catTitle(w.link)));
         status.textContent = 'Click the image again or press esc to release';
-      } else status.textContent = 'Select an image to focus · drag to spin';
+      } else status.textContent = 'Select an image to focus · drag any way to spin';
       layout();
     }
 
@@ -70,10 +76,11 @@
       var base = Math.max(86, Math.min(190, Math.min(W, H) * 0.24));
       nodes.forEach(function (n, i) {
         if (i === selected) { n.style.transform = ''; n.style.zIndex = 200; n.style.opacity = 1; n.style.width = ''; return; }
-        var y = 1 - (i / (nodes.length - 1)) * 2;
-        var ring = Math.sqrt(1 - y * y);
-        var a = golden * i + rotation;
-        var x = Math.cos(a) * ring, z = Math.sin(a) * ring, depth = (z + 1) / 2;
+        var by = 1 - (i / (nodes.length - 1)) * 2;
+        var ring = Math.sqrt(1 - by * by), a = golden * i;
+        var bx = Math.cos(a) * ring, bz = Math.sin(a) * ring;
+        var x = R[0] * bx + R[1] * by + R[2] * bz, y = R[3] * bx + R[4] * by + R[5] * bz;
+        var z = R[6] * bx + R[7] * by + R[8] * bz, depth = (z + 1) / 2;
         var s = 0.5 + depth * 0.5;
         n.style.width = base + 'px';
         n.style.transform = 'translate3d(' + (W / 2 + x * rx) + 'px,' + (H / 2 + y * ry) + 'px,0) translate(-50%,-50%) scale(' + s.toFixed(3) + ')';
@@ -85,19 +92,25 @@
     }
     function tick(now) {
       var dt = Math.min(now - last, 40); last = now;
-      if (!dragging) rotation += dt * spin;
+      if (!dragging) {                                   /* idle drift + momentum after a throw */
+        turnY(dt * spin + vx); turnX(vy);
+        vx *= 0.94; vy *= 0.94;
+      }
       layout();
       raf = requestAnimationFrame(tick);
     }
 
     /* drag sideways to spin the sphere */
     var dragging = null, dragged = false;
-    cloud.addEventListener('pointerdown', function (e) { dragging = { x: e.clientX, rot: rotation }; dragged = false; });
+    cloud.addEventListener('pointerdown', function (e) { dragging = { x: e.clientX, y: e.clientY, far: 0 }; dragged = false; vx = vy = 0; });
     function move(e) {
       if (!dragging) return;
-      var dx = e.clientX - dragging.x;
-      if (Math.abs(dx) > 6) dragged = true;
-      rotation = dragging.rot + dx * 0.006;
+      var dx = e.clientX - dragging.x, dy = e.clientY - dragging.y;
+      dragging.x = e.clientX; dragging.y = e.clientY;
+      dragging.far += Math.abs(dx) + Math.abs(dy);
+      if (dragging.far > 6) dragged = true;
+      vx = dx * 0.006; vy = -dy * 0.006;
+      turnY(vx); turnX(vy);
       if (reduce) layout();
     }
     function up() { dragging = null; setTimeout(function () { dragged = false; }, 0); }
