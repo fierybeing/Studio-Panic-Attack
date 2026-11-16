@@ -326,10 +326,20 @@ window.SPA_MEDIA = {
    "h": 1262,
    "w": 1394
   },
+  "about/hi-trim": {
+   "a": 1,
+   "h": 745,
+   "w": 676
+  },
   "about/imagestrip": {
    "a": 1,
    "h": 275,
    "w": 1920
+  },
+  "about/portrait": {
+   "a": 0,
+   "h": 902,
+   "w": 1322
   },
   "about/under-image-strip": {
    "a": 1,

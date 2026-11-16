@@ -80,7 +80,91 @@ window.SPA_CONTENT = {
         desc: 'Turning a space into a landscape where anything is possible.' },
       { img: 'fig/geodome', title: 'Geodome', category: 'Installation', year: '', link: 'installations',
         desc: 'A pink geodesic structure built for a festival environment.' }
-    ]
+    ],
+
+    /* Below the sphere: the page keeps scrolling through these sections.
+       Each flying picture:  img = which picture, fx = effect it wears until you hover
+       ('flute' ribbed glass, 'halftone' print dots, 'dither' chunky pixels, or leave out),
+       x / y / w = position and width in % of its area, d = how fast it flies, r = tilt.
+       After changing img or fx here, run:  python3 tools/make_fx.py                  */
+    manifesto: {
+      lines: ['Design beyond', 'the traditional', 'format'],
+      hint: '— Plzz click me!! :3 —',
+      flyers: [
+        { img: 'photo/000008390034-33a-copy-2', x: 0, y: 12, w: 50, d: 0.5, r: -2 },
+        { img: 'gd/img-9089', fx: 'flute', x: 42, y: 3, w: 44, d: 1.3, r: 3 },
+        { img: 'gd/img-9247', fx: 'halftone', x: 30, y: 38, w: 40, d: 0.9, r: -1 },
+        { img: 'da/img-4311', fx: 'dither', x: 2, y: 60, w: 42, d: 1.2, r: 8 }
+      ]
+    },
+
+    sections: [
+      {
+        no: '01', title: 'Graphic Design', link: 'graphic-design',
+        text: 'A diverse collection showcasing a unique blend of renowned and niche styles. Each piece reflects experimentation and versatility, integrating fine art, sketching, AI, and even 3D modeling to create innovative and dynamic creations. Crafted with powerful tools like Adobe Creative Software, Procreate, Nomad, Midjourney, and more.',
+        flyers: [
+          { img: 'gd/pegasus', fx: 'halftone', x: 30, y: 0, w: 38, d: 0.5, r: 3 },
+          { img: 'hl/holistic-art-mag-vol-0-cover-page', fx: 'flute', x: 2, y: 18, w: 50, d: 1.0, r: -3 },
+          { img: 'gd/glasserrorscrnshot', x: 62, y: 8, w: 34, d: 1.4, r: 2 },
+          { img: 'gd/img-3335', x: 54, y: 52, w: 34, d: 0.8, r: -2 },
+          { img: 'gd/img-3330', fx: 'dither', x: 0, y: 70, w: 26, d: 1.3, r: 5 }
+        ]
+      },
+      {
+        no: '02', title: '3D Art', link: '3d',
+        text: 'From high-poly nature environments to charming low-poly scenes, each creation reflects my passion for crafting immersive worlds and characters. Whether organic or inorganic, 3D modeling allows me to bring my ideas to life, sharing unique experiences with others. Crafted in Autodesk Maya, Blender, Unreal Engine 5, and more.',
+        flyers: [
+          { img: '3d/cemetery-scene20', x: 2, y: 6, w: 64, d: 0.6, r: -2 },
+          { img: '3d/img-9754-min', fx: 'flute', x: 56, y: 20, w: 36, d: 1.2, r: 4 },
+          { img: '3d/img-4285', fx: 'halftone', x: 4, y: 42, w: 48, d: 1.0, r: 2 },
+          { img: '3d/img-3761', x: 40, y: 70, w: 28, d: 1.5, r: -5 },
+          { img: '3d/levelsequence-1-0011', fx: 'dither', x: 0, y: 82, w: 36, d: 0.7, r: -3 }
+        ]
+      },
+      {
+        no: '03', title: 'Interactive Media Technology', link: 'installations',
+        text: 'Creating engagement through interactive technology projects that push towards unconventional methods of connection; explore my latest work showcasing dynamic experiences designed to captivate and inspire.',
+        flyers: [
+          { img: 'fig/geodome', x: 18, y: 4, w: 58, d: 0.8, r: -3 },
+          { img: 'fig/lamp', x: 76, y: 0, w: 20, d: 1.4, r: 4 },
+          { img: 'proj/img-2778', fx: 'flute', x: 2, y: 42, w: 36, d: 1.1, r: -4 },
+          { img: 'fig/blob', x: 44, y: 46, w: 32, d: 1.3, r: 6 },
+          { img: 'imt/img-9639', fx: 'halftone', x: 70, y: 58, w: 28, d: 0.6, r: 3 }
+        ]
+      },
+      {
+        no: '04', title: 'Events', link: 'events',
+        text: 'I design experiences that get people to interact — with each other, with a space, or with an idea. Most of my work sits between events, art, and community.',
+        flyers: [
+          { img: 'ev/treasure-hunt', fx: 'flute', x: 4, y: 4, w: 46, d: 0.9, r: -3 },
+          { img: 'gd/print-poster-4', x: 56, y: 10, w: 36, d: 1.3, r: 3 },
+          { img: 'gd/img-0669', fx: 'halftone', x: 22, y: 46, w: 34, d: 0.6, r: 4 },
+          { img: 'ev/img-3380', x: 50, y: 66, w: 46, d: 1.4, r: -2 },
+          { img: 'gd/artist-frame-2', fx: 'dither', x: 0, y: 72, w: 24, d: 1.1, r: -6 }
+        ]
+      }
+    ],
+
+    /* "stack" must match a label on the Highlights page; clicking opens that stack. */
+    featured: {
+      eyebrow: '— Selected highlights',
+      title: 'Featured pieces',
+      items: [
+        { img: 'hl/cemetery-scene20', title: 'Cemetery Scene', kind: '3D environment', stack: 'Cemetery Scene' },
+        { img: 'hl/holistic-art-mag-vol-0-cover-page', title: 'Holistic Art Magazine', kind: 'Editorial', stack: 'Holistic Art Magazine' },
+        { img: 'hl/chrome-type-bw-4', title: 'Chrome Type', kind: '3D typography', stack: 'Chrome Type' },
+        { img: 'hl/glasserrorscrnshot', title: 'Internal HTTP 500 Error', kind: 'Poster', stack: 'Internal HTTP 500 Error' }
+      ],
+      flyers: [
+        { img: 'photo/img-4238', fx: 'halftone', x: 8, y: 0, w: 56, d: 0.7, r: 2 },
+        { img: '3d/img-1034', fx: 'dither', x: 50, y: 34, w: 50, d: 1.3, r: -3 }
+      ]
+    },
+
+    outro: {
+      title: 'Let’s talk.',
+      text: 'Got an idea, a project, an event you want to make weirder?'
+    }
   },
 
   /* ── PROJECTS: the ten folders ────────────────────────────────────────── */

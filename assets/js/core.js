@@ -246,6 +246,7 @@
 
   SPA.start = function () {
     buildHeader();
+    if (SPA.fx) SPA.fx.cursor();
     window.addEventListener('hashchange', render);
     render();
   };
