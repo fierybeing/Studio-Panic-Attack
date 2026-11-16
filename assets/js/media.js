@@ -1016,6 +1016,21 @@ window.SPA_MEDIA = {
    "a": 1,
    "h": 2823,
    "w": 2257
+  },
+  "web/home": {
+   "a": 0,
+   "h": 900,
+   "w": 1440
+  },
+  "web/installations": {
+   "a": 0,
+   "h": 900,
+   "w": 1440
+  },
+  "web/projects": {
+   "a": 0,
+   "h": 900,
+   "w": 1440
   }
  },
  "videos": {

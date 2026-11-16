@@ -40,14 +40,27 @@ CV link. You never need to touch the other files.
 - **Images** are referenced by keys like `'gd/pegasus'`, meaning
   `media/gd/pegasus.webp` (large) and `media/gd/pegasus.t.webp` (thumbnail).
 
-## Adding new images or videos
+## Adding new images
 
-1. Put the originals in the source folders of the old repo (`public/2. Projects/…`),
-   or add a folder to `GROUPS` in `tools/build_media.py`.
-2. Run (needs Python with Pillow, plus ffmpeg for video):
-   `python3 tools/build_media.py <old-repo>/public tools/figma-cutouts .`
-3. Use the new keys in `content.js`.
-4. Check every key resolves: `node tools/check_keys.js .`
+Run this from the site folder (needs Python with Pillow):
+
+```sh
+python3 tools/add_images.py web ~/Desktop/my-screenshot.png
+```
+
+It makes `media/web/my-screenshot.webp` plus a thumbnail and prints the key
+(`'web/my-screenshot'`) to use in `content.js`. The first word is the group
+(folder) name: use an existing one such as `gd`, `3d`, `photo`, `web`, or a new one.
+
+Check that every key in `content.js` points at a real file:
+
+```sh
+node tools/check_keys.js .
+```
+
+`tools/build_media.py` is the script that converted the whole original library
+(images and videos) from the old repo's `public/` folder. You only need it to
+redo everything from scratch.
 
 ## Preview on your computer
 

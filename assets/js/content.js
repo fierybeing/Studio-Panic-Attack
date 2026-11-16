@@ -443,8 +443,16 @@ window.SPA_CONTENT = {
       {
         name: 'Events',
         stacks: [
-          { label: 'Gravröset Treasure Hunt', category: 'Campaign', text: 'A treasure-hunt campaign to drive engagement, with tickets and merch as rewards.', images: ['ev/treasure-hunt', 'hl/epicenter-treasure-hunt'] },
+          { label: 'Gravröset Treasure Hunt', category: 'Campaign', text: 'A treasure-hunt campaign to drive engagement, with tickets and merch as rewards.', images: ['ev/treasure-hunt'] },
           { label: 'Post Mortem', category: 'Winter event · Dec 2024', text: 'Colder, darker, but still alive underneath — one night of revival at Reimersholme.', images: ['gd/print-poster-4', 'gd/artist-frame-1', 'gd/img-0669'] }
+        ]
+      },
+      {
+        name: 'Web design',
+        stacks: [
+          { label: 'Epicenter Stockholm', category: 'Website · 2024', text: 'Website prototype for Epicenter Stockholm: home, our story, clusters and the month’s events.', images: ['ux/skjermbilde-2024-05-19-191532', 'ux/skjermbilde-2024-05-19-192023', 'ux/skjermbilde-2024-05-19-192201', 'ux/skjermbilde-2024-05-19-191908', 'ux/skjermbilde-2024-05-19-192042'] },
+          { label: 'Epicenter Treasure Hunt', category: 'Web app + AR concept', text: 'An interactive treasure hunt across Stockholm, with printed posters, QR codes and AR.', images: ['hl/epicenter-treasure-hunt'] },
+          { label: 'Studio Panic Attack', category: 'Website · 2026', text: 'This website. Structure designed in Figma, built as plain HTML, CSS and JavaScript.', images: ['web/home', 'web/projects', 'web/installations'] }
         ]
       }
     ]

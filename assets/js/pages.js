@@ -163,7 +163,9 @@
     });
     var rail = h('div.wall', track);
     return h('div.highlights',
-      h('header.page__head', h('p.eyebrow', '— highlights —'), h('h1.page__title', H.title), h('p.lede', H.intro)),
+      h('header.page__head',
+        h('p.eyebrow', '— highlights —'), h('h1.page__title', H.title), h('p.lede', H.intro),
+        h('p.wall__hint', H.columns.length + ' boards · scroll sideways →')),
       rail, SPA.sideways(rail));
   };
 

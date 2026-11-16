@@ -133,6 +133,16 @@ def main():
         s = slug(f)
         jobs.append(('fig/' + s, os.path.join(FIG, f), 'fig', s, True))
 
+    extra = os.path.join(SITE, 'tools', 'extra')      # images added later with add_images.py
+    if os.path.isdir(extra):
+        for group in sorted(os.listdir(extra)):
+            gd = os.path.join(extra, group)
+            if not os.path.isdir(gd):
+                continue
+            for f in sorted(os.listdir(gd)):
+                if IMG.search(f):
+                    jobs.append((group + '/' + slug(f), os.path.join(gd, f), group, slug(f), False))
+
     def run(job):
         key, p, group, s, trim = job
         try:

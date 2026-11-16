@@ -99,20 +99,31 @@
     drawPost();
   }
   function buildPost() {
+    var media = h('div.post__media',
+      h('div.post__stage'),
+      h('button.post__arrow.post__arrow--prev', { type: 'button', 'aria-label': 'Previous photo', onclick: function () { stepPost(-1); } }, '←'),
+      h('button.post__arrow.post__arrow--next', { type: 'button', 'aria-label': 'Next photo', onclick: function () { stepPost(1); } }, '→'),
+      h('span.post__count'));
     post.el = h('div.post', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Work viewer',
       onclick: function (e) { if (e.target === post.el) SPA.closePost(); } },
       h('div.post__frame',
-        h('div.post__media'),
+        media,
         h('aside.post__side',
           h('header.post__head',
             h('span.post__avatar', { 'aria-hidden': 'true' }),
             h('span.post__handle', C.site.name),
             h('button.post__close', { type: 'button', 'aria-label': 'Close', onclick: SPA.closePost }, '×')),
           h('div.post__body'),
-          h('footer.post__foot',
-            h('button.post__nav', { type: 'button', 'aria-label': 'Previous', onclick: function () { stepPost(-1); } }, '←'),
-            h('span.post__count'),
-            h('button.post__nav', { type: 'button', 'aria-label': 'Next', onclick: function () { stepPost(1); } }, '→')))));
+          h('footer.post__thumbs', { 'aria-label': 'All photos in this stack' }))));
+    /* swipe left / right on touch screens */
+    var sx = null;
+    media.addEventListener('pointerdown', function (e) { sx = e.pointerType === 'touch' ? e.clientX : null; });
+    media.addEventListener('pointerup', function (e) {
+      if (sx === null) return;
+      var dx = e.clientX - sx; sx = null;
+      if (Math.abs(dx) > 45) stepPost(dx < 0 ? 1 : -1);
+    });
+    media.addEventListener('pointercancel', function () { sx = null; });
     document.addEventListener('keydown', function (e) {
       if (!post.el.parentNode) return;
       if (e.key === 'Escape') SPA.closePost();
@@ -122,23 +133,37 @@
   }
   function drawPost() {
     var it = post.items[post.i];
-    var media = post.el.querySelector('.post__media');
+    var stage = post.el.querySelector('.post__stage');
     var body = post.el.querySelector('.post__body');
-    media.textContent = ''; body.textContent = '';
+    var thumbs = post.el.querySelector('.post__thumbs');
+    stage.textContent = ''; body.textContent = '';
     if (it.video) {
-      media.appendChild(h('video', { src: SPA.videoSrc(it.video), poster: SPA.posterSrc(it.video),
+      stage.appendChild(h('video', { src: SPA.videoSrc(it.video), poster: SPA.posterSrc(it.video),
         controls: true, autoplay: true, loop: true, playsinline: true }));
     } else {
-      media.appendChild(SPA.img(it.img, { thumb: false, eager: true, alt: it.title || '' }));
+      stage.appendChild(SPA.img(it.img, { thumb: false, eager: true, alt: it.title || '' }));
     }
     if (it.title) body.appendChild(h('h2.post__title', it.title));
     if (it.category) body.appendChild(h('p.post__cat', it.category));
     (Array.isArray(it.text) ? it.text : (it.text ? [it.text] : [])).forEach(function (p) {
       body.appendChild(h('p.post__text', p));
     });
-    post.el.querySelector('.post__count').textContent =
-      SPA.pad(post.i + 1) + ' / ' + SPA.pad(post.items.length);
-    post.el.querySelector('.post__foot').classList.toggle('is-single', post.items.length < 2);
+    var many = post.items.length > 1;
+    post.el.classList.toggle('is-single', !many);
+    post.el.querySelector('.post__count').textContent = SPA.pad(post.i + 1) + ' / ' + SPA.pad(post.items.length);
+    if (post.thumbsFor !== post.items) {              /* build the strip once per stack */
+      post.thumbsFor = post.items;
+      thumbs.textContent = '';
+      if (many) post.items.forEach(function (x, n) {
+        thumbs.appendChild(h('button', { type: 'button', 'aria-label': 'Photo ' + (n + 1),
+          onclick: function () { post.i = n; drawPost(); } },
+          h('img', { src: x.video ? SPA.posterSrc(x.video) : SPA.src(x.img, true), alt: '', loading: 'lazy' })));
+      });
+    }
+    thumbs.querySelectorAll('button').forEach(function (b, n) {
+      b.classList.toggle('is-on', n === post.i);
+      if (n === post.i && b.scrollIntoView) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    });
   }
 
   /* Turn a list of image keys into viewer items sharing one caption. */
