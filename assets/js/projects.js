@@ -7,7 +7,7 @@
   var SPA = window.SPA, C = SPA.C, h = SPA.h, pad = SPA.pad;
 
   /* Where each folder sits on the desk (left %, top %) — from the Figma file. */
-  var FOLDER_POS = [[12, 4], [74, 3], [36, 19], [62, 18], [18, 37], [80, 33], [46, 50], [70, 57], [16, 66], [52, 73]];
+  var FOLDER_POS = [[12, 4], [78, 2], [36, 18], [59, 21], [18, 38], [83, 34], [45, 51], [70, 58], [15, 67], [50, 74]];
 
   SPA.views.projects = function (parts) {
     var slug = parts[0];

@@ -6,7 +6,7 @@
      SPA.fx.knot(canvas)       the glossy 3D knot (plain WebGL, no library)
      SPA.fx.disperse(root)     letters that scatter away from the cursor
      SPA.fx.embers(canvas)     glowing particles drawn to the cursor
-     SPA.fx.cursor()           the ultramarine dot that trails the mouse
+     SPA.fx.cursor()           the four-pointed star that replaces the mouse cursor
 
    Each one returns a function that stops it. Every loop pauses when its
    element is off screen, and all of them stand still for visitors who have
@@ -129,7 +129,8 @@
 
   /* ── 3. the knot ───────────────────────────────────────────────────────
      A torus knot tube, shaded like polished lacquer in a photo studio.
-     Drag to turn it; click to change what it is made of.                    */
+     Drag to carry it around (it turns as it goes); click to change what it
+     is made of. Left alone it bobs gently.                                  */
   var KNOT_LOOKS = [
     { base: [0.02, 0.02, 0.025], tint: [0.85, 0.04, 0.04] },    /* black lacquer, red glow */
     { base: [0.05, 0.05, 0.62], tint: [0.45, 0.55, 1.0] },      /* ultramarine */
@@ -174,7 +175,7 @@
     gl.attachShader(prog, shader(gl.VERTEX_SHADER,
       'attribute vec3 aPos, aNor; uniform mat3 uR; uniform float uAspect; varying vec3 vN, vP;' +
       'void main(){ vec3 p = uR * aPos; vN = uR * aNor; vP = p; float z = p.z - 4.6;' +
-      ' gl_Position = vec4(p.x * 2.5 / uAspect, p.y * 2.5, -1.2222 * z - 2.2222, -z); }'));
+      ' gl_Position = vec4(p.x * 2.0 / uAspect, p.y * 2.0, -1.2222 * z - 2.2222, -z); }'));
     gl.attachShader(prog, shader(gl.FRAGMENT_SHADER,
       'precision mediump float; varying vec3 vN, vP; uniform vec3 uBase, uTint;' +
       'void main(){ vec3 n = normalize(vN); vec3 v = normalize(vec3(0.0, 0.0, 4.6) - vP); vec3 r = reflect(-v, n);' +
@@ -218,22 +219,44 @@
       gl.uniform3fv(uBase, KNOT_LOOKS[look].base); gl.uniform3fv(uTint, KNOT_LOOKS[look].tint);
       gl.drawElements(gl.TRIANGLES, idx.length, gl.UNSIGNED_SHORT, 0);
     }
+    /* where the knot has been carried to, relative to its home spot */
+    var mover = canvas.parentNode, off = { x: 0, y: 0 }, lim = { x0: 0, x1: 0, y0: 0, y1: 0 };
+    function place(now) {
+      var bob = REDUCE || drag ? 0 : 1;
+      mover.style.transform = 'translate3d(' + (off.x + bob * Math.sin(now / 1500) * 7).toFixed(1) + 'px,' +
+        (off.y + bob * Math.cos(now / 1900) * 6).toFixed(1) + 'px,0)';
+    }
     function frame(now) {
       raf = requestAnimationFrame(frame);
       if (!seen) return;
       var dt = Math.min(now - (last || now), 40); last = now;
       var sy = window.scrollY, ds = sy - lastY; lastY = sy;
       if (!drag) { turnY(dt * 0.00045 + vx + ds * 0.0016); turnX(dt * 0.00018 + vy); vx *= 0.94; vy *= 0.94; }
-      paint();
+      place(now); paint();
     }
     var drag = null, moved = 0;
-    function down(e) { drag = { x: e.clientX, y: e.clientY }; moved = 0; vx = vy = 0; }
+    function down(e) {
+      drag = { x: e.clientX, y: e.clientY, touch: e.pointerType === 'touch' }; moved = 0; vx = vy = 0;
+      /* it may travel across most of the screen, but not out of reach */
+      var home = mover.parentNode.getBoundingClientRect(), cx = home.left + home.width / 2;
+      lim.x0 = window.innerWidth * 0.16 - cx; lim.x1 = window.innerWidth * 0.9 - cx;
+      lim.y0 = -window.innerHeight * 0.38; lim.y1 = window.innerHeight * 0.38;
+      canvas.classList.add('is-held');
+    }
     function move(e) {
       if (!drag) return;
-      var dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
-      moved += Math.abs(dx) + Math.abs(dy); vx = dx * 0.008; vy = -dy * 0.008; turnY(vx); turnX(vy);
+      /* a finger carries it sideways only, so swiping up and down still scrolls the page */
+      var dx = e.clientX - drag.x, dy = drag.touch ? 0 : e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+      moved += Math.abs(dx) + Math.abs(dy);
+      off.x = clamp(off.x + dx, Math.min(lim.x0, off.x), Math.max(lim.x1, off.x));
+      off.y = clamp(off.y + dy, Math.min(lim.y0, off.y), Math.max(lim.y1, off.y));
+      vx = dx * 0.006; vy = -dy * 0.006; turnY(vx); turnX(vy);
+      if (REDUCE) { place(0); paint(); }
     }
-    function up() { if (drag && moved < 6) { look = (look + 1) % KNOT_LOOKS.length; if (REDUCE) paint(); } drag = null; }
+    function up() {
+      if (drag && moved < 6) { look = (look + 1) % KNOT_LOOKS.length; if (REDUCE) paint(); }
+      drag = null; canvas.classList.remove('is-held');
+    }
     canvas.addEventListener('pointerdown', down);
     window.addEventListener('pointermove', move); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
     var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (en) { seen = en[0].isIntersecting; }) : null;
@@ -369,25 +392,34 @@
     };
   };
 
-  /* ── 6. the cursor dot ─────────────────────────────────────────────────
-     A small ultramarine dot that trails the mouse and swells over anything
-     clickable. Mouse only; the normal cursor stays.                         */
+  /* ── 6. the star cursor ────────────────────────────────────────────────
+     On mouse devices the arrow is swapped for a four-pointed star with a
+     tiny companion. It twinkles, whirls over anything clickable and steps
+     aside for the text cursor inside form fields.                           */
+  var STAR = 'M16 1C17.2 10.5 21.5 14.8 31 16C21.5 17.2 17.2 21.5 16 31C14.8 21.5 10.5 17.2 1 16C10.5 14.8 14.8 10.5 16 1Z';
   SPA.fx.cursor = function () {
     if (REDUCE || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    var dot = document.createElement('div'); dot.className = 'cursor'; dot.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(dot);
-    var x = -100, y = -100, tx = -100, ty = -100, shown = false;
+    var NS = 'http://www.w3.org/2000/svg';
+    function star(cls) {
+      var svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path');
+      svg.setAttribute('viewBox', '0 0 32 32'); svg.setAttribute('class', cls); path.setAttribute('d', STAR);
+      svg.appendChild(path); return svg;
+    }
+    var el = document.createElement('div'); el.className = 'cursor'; el.setAttribute('aria-hidden', 'true');
+    el.appendChild(star('cursor__big')); el.appendChild(star('cursor__small'));
+    document.body.appendChild(el);
+    var armed = false;
     window.addEventListener('pointermove', function (e) {
       if (e.pointerType !== 'mouse') return;
-      tx = e.clientX; ty = e.clientY;
-      if (!shown) { x = tx; y = ty; shown = true; dot.classList.add('is-on'); }
-      dot.classList.toggle('is-over', !!e.target.closest('a, button, input, textarea, .knot'));
+      if (!armed) { armed = true; document.documentElement.classList.add('has-star'); }   /* only once a real mouse shows up */
+      el.style.transform = 'translate3d(' + e.clientX + 'px,' + e.clientY + 'px,0)';
+      el.classList.add('is-on');
+      var t = e.target.closest ? e.target : document.body;
+      el.classList.toggle('is-text', !!t.closest('input, textarea'));
+      el.classList.toggle('is-over', !!t.closest('a, button, .knot, video'));
     });
-    document.addEventListener('pointerleave', function () { shown = false; dot.classList.remove('is-on'); });
-    (function loop() {
-      x += (tx - x) * 0.22; y += (ty - y) * 0.22;
-      dot.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
-      requestAnimationFrame(loop);
-    })();
+    window.addEventListener('pointerdown', function () { el.classList.add('is-down'); });
+    window.addEventListener('pointerup', function () { el.classList.remove('is-down'); });
+    document.documentElement.addEventListener('mouseleave', function () { el.classList.remove('is-on'); });
   };
 })();

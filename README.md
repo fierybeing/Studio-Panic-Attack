@@ -63,14 +63,13 @@ python3 tools/make_fx.py
 
 ## Fonts
 
-Four lines at the top of `assets/css/site.css` set every font on the site:
+Three lines at the top of `assets/css/site.css` set every font on the site:
 
 | Variable | Used for | Font | Licence |
 |---|---|---|---|
-| `--mono` | labels, menus, headings | Geist Mono | SIL Open Font License (file in `assets/fonts`) |
-| `--type` | running text | Courier Prime (typewriter) | SIL Open Font License (file in `assets/fonts`) |
+| `--mono` | labels, headings, the big numbers | Geist Mono | SIL Open Font License (file in `assets/fonts`) |
+| `--type` | the menu and running text | Courier Prime (typewriter) | SIL Open Font License (file in `assets/fonts`) |
 | `--script` | big handwritten titles | Quiet Attempt | © Struvictory.art. Carried over from the previous site: check that you hold a licence for web use. |
-| `--pixel` | the outlined numbers | Alagard by Hewett Tsoi | carried over from the previous site: check the author's terms |
 
 ## Adding new images
 

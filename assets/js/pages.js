@@ -13,7 +13,7 @@
   SPA.views.home = function () {
     var D = C.home;
     var floor = h('canvas.floor', { 'aria-hidden': 'true' });
-    var knot = h('canvas.knot', { 'aria-label': '3D knot. Drag to turn it, click to change its material.', role: 'img' });
+    var knot = h('canvas.knot', { 'aria-label': '3D knot. Drag to carry it around and turn it, click to change its material.', role: 'img' });
     var root = h('div.home', floor, orbit(), manifesto(knot), D.sections.map(category), featured(), outro());
     requestAnimationFrame(function () {
       if (!root.isConnected) return;
@@ -47,7 +47,7 @@
       h('div.manifesto__copy',
         h('div.manifesto__lockup',
           h('h2.manifesto__big', M.lines.map(function (l, i) { return [i ? h('br') : null, l]; })),
-          h('div.manifesto__knot', knot, h('p.manifesto__hint', M.hint))),
+          h('div.manifesto__knot', h('div.knot-move', knot, h('p.manifesto__hint', M.hint)))),
         h('p.manifesto__say', C.site.statement)));
   }
 
@@ -90,7 +90,7 @@
       h('p.outro__text', O.text),
       h('p.outro__links',
         h('a.go', { href: '#/contact' }, 'Write to me ', arrow()),
-        h('a.go', { href: '#/projects' }, 'Open the folders ', arrow())),
+        h('a.go', { href: '#/projects' }, 'See my projects ', arrow())),
       footer());
   }
 
@@ -381,6 +381,7 @@
       return h('label.postit__field', h('span', label), input);
     }
     var form = h('form.postit', { novalidate: true, onsubmit: submit },
+      h('span.postit__paper', { 'aria-hidden': 'true' }),
       h('span.postit__tape', { 'aria-hidden': 'true' }),
       field('Name', 'name', 'text', true),
       field('Email', 'email', 'email', true),
