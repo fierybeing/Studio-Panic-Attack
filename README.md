@@ -150,6 +150,14 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
+## Where it lives now
+
+**https://studiopanicattack.com** (and www) is served by the Cloudflare Pages project
+`studio-panic-attack` (studio-panic-attack.pages.dev), built from the **`ema-site`**
+branch of this repo. Every push to that branch goes live in about a minute, with no
+build step. Email stays on Hostinger: the MX, SPF, DKIM and DMARC records in Cloudflare
+DNS are untouched.
+
 ## Publish on Cloudflare Pages (your own domain)
 
 1. Cloudflare dashboard → **Workers & Pages → Create → Pages**.
