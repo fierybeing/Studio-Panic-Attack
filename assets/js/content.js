@@ -566,8 +566,8 @@ window.SPA_CONTENT = {
       { slug: 'vocabulary', title: 'Vocabulary', kind: 'A small dictionary', text: 'The words and shapes that keep coming back in my work.' },
       { slug: 'cards', title: 'Curiosity cards', kind: 'Card game', text: 'Draw a question, talk it through, earn a match, light the candle.' },
       { slug: 'dress-up', title: 'Dress-up', kind: 'Paper doll', text: 'A model and a sheet of clothes to pull over them.' },
-      { slug: 'castle', title: 'Cardboard castle', kind: 'Open the windows', text: 'Behind every window and the door: something I like.' },
-      { slug: 'shadowrealm', title: 'Shadowrealm', kind: 'Shadow theatre', text: 'A tent with a small stop-motion shadow play inside.' }
+      { slug: 'castle', title: 'Cardboard castle', kind: 'Open the shutters', text: 'A clay castle at dusk. Behind every window and the door: something I like.' },
+      { slug: 'shadowrealm', title: 'Shadowrealm', kind: 'Shadow theatre', text: 'A muslin tent by candlelight, with a small stop-motion shadow play inside.' }
     ],
 
     /* 02 — the two decks from the Curiosity room. Add, remove or rewrite questions freely. */
@@ -610,7 +610,7 @@ window.SPA_CONTENT = {
     /* 04 — what is behind each window. "img" is optional (a picture from the site);
        without it the room just shows the words. The last entry is the door.      */
     castle: {
-      intro: 'A castle made of boxes. Click the windows and the door: each one opens onto something I like.',
+      intro: 'A little castle sculpted from clay, on a set at dusk. Click the shutters and the door: each one opens onto something I like.',
       rooms: [
         { label: 'Film cameras', note: 'An Olympus, a roll of film and whatever happens in front of it.', img: 'photo/000008390034-33a-copy-2' },
         { label: 'The Sims', note: 'World’s biggest fan. Sims 2, 3 and 4, with far too much custom content.' },

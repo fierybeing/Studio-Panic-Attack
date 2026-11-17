@@ -25,8 +25,8 @@ Built from three sources:
 | `#/random/vocabulary` | 01 Vocabulary: the A–Z dictionary (A, B, C so far). The old `#/vocabulary` address still lands here. |
 | `#/random/cards` | 02 Curiosity cards: two decks, a matchbox and a candle |
 | `#/random/dress-up` | 03 Dress-up: a paper doll and a sheet of clothes to drag onto it |
-| `#/random/castle` | 04 Cardboard castle: six windows and a door that open onto things you like |
-| `#/random/shadowrealm` | 05 Shadowrealm: a tent with a stop-motion shadow play in three acts |
+| `#/random/castle` | 04 Cardboard castle: a clay castle on a dusk set; six shutters and a door open onto things you like |
+| `#/random/shadowrealm` | 05 Shadowrealm: a muslin tent by candlelight with a stop-motion shadow play in three acts, and a carousel shadow turning on the wall |
 | `#/shop` | Shop: a shelf of products that scrolls sideways and a basket to drop them in |
 | `#/about` | Dark opening with the portrait (letters scatter from the cursor, embers drift toward it), then disciplines, places, the knife text loop and the film strip |
 | `#/contact` | Post-it contact form |
@@ -58,8 +58,20 @@ In `content.js`, under `random`:
 - `shadow.acts`: the names of the three acts.
 - `vocabulary` (its own block just above `random`) holds the dictionary entries.
 
-The drawings themselves (doll, clothes, castle, tent, the shadow puppets) are made
-in code in `assets/js/random.js`. To add a piece of clothing, copy one entry in the
+The doll, the clothes and the shadow puppets are drawn in code in `assets/js/random.js`.
+
+The **clay castle** and the **Shadowrealm room** (tent, plaster wall, floor, candelabras)
+are drawn in `tools/scenes/castle.html` and `tools/scenes/realm.html` and baked into
+pictures in `media/scene/`. After changing one of those files, bake again (needs Python
+with Pillow and Playwright: `pip install pillow playwright`):
+
+```sh
+python3 tools/bake_scenes.py          # or: castle / realm
+```
+
+If you move a window, the door or a candle, copy the new numbers the bake prints into
+`media/scene/*.json` over to the `FLAPS` / `DOOR` or `ROOM` lists in `random.js`.
+The flames, curtains, the shadow play and the carousel shadow on the wall stay live. To add a piece of clothing, copy one entry in the
 `GARMENTS` list there: a name, a slot (pieces in the same slot swap), a layer, the
 box it fills and its shapes, all in the doll's own 300 × 700 units.
 
@@ -170,6 +182,7 @@ assets/js/media.js      auto-generated image sizes (don't edit)
 assets/js/knife.js      Swiss-knife outline for the text loop
 assets/fonts/           Geist Mono, Courier Prime, Quiet Attempt
 media/                  optimised images (.webp) and videos (.mp4)
+media/scene/            the baked clay castle and Shadowrealm room (made by tools/bake_scenes.py)
 media/fx/               effect versions of the flying pictures (made by tools/make_fx.py)
 tools/                  scripts: add images, bake effects, check keys, rebuild media; the Figma cut-outs
 ```

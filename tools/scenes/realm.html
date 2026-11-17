@@ -1,0 +1,212 @@
+<!doctype html><meta charset="utf-8"><title>shadowrealm set</title>
+<style>html,body{margin:0;background:transparent}svg{display:block}</style>
+<svg id="s" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000"></svg>
+<script src="common.js"></script>
+<script>
+/* The Shadowrealm room: plaster wall, whitewashed floor with cotton snow,
+   a muslin tent on a black wire frame, brass candelabras.
+   The shadow play itself, the carousel shadow and the flames are live on the
+   site; this file only draws what stays still. */
+var OPEN = [590, 470, 420, 380];                 /* the tent opening = the play screen */
+var defs = '', out = '', FLAMES = [];
+defs += clay('brass', { blur: 2.2, surface: 3.2, wobble: 2, wf: 0.04, dents: 0.04, grain: 0.03, spec: 1.25, exp: 22, el: 42, gain: 1.05, pad: 30 });
+defs += clay('wax', { blur: 3, surface: 2.6, wobble: 1.5, wf: 0.05, dents: 0.03, spec: 0.35, exp: 10, el: 55, gain: 1.08, pad: 30 });
+defs += clay('iron', { blur: 1.4, surface: 2, wobble: 1.2, wf: 0.05, dents: 0.02, spec: 0.55, exp: 18, gain: 1.2, pad: 20 });
+defs += clay('brick', { blur: 3, surface: 4, wobble: 3, wf: 0.04, dents: 0.18, df: 0.06, grain: 0.12, spec: 0.08, pad: 6 });
+defs += clay('cotton', { blur: 12, surface: 3.2, wobble: 26, wf: 0.022, dents: 0.3, df: 0.05, grain: 0.05, spec: 0.03, el: 62, gain: 1.1, pad: 10, seed: 41 });
+defs += shadowF('drop', -5, 8, 6, 0.4) + shadowF('dropSoft', -10, 14, 16, 0.32) + shadowF('dropFar', -22, 10, 22, 0.28);
+defs +=
+  /* plaster: blotchy, slightly lumpy */
+  '<filter id="plaster" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
+  '<feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="4" seed="3" result="m"/><feColorMatrix in="m" type="matrix" values="0 0 0 0 .55  0 0 0 0 .42  0 0 0 0 .3  0 0 0 -1.2 .62" result="blot"/>' +
+  '<feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="6" result="b"/><feDiffuseLighting in="b" surfaceScale=".6" lighting-color="#fff" result="bump"><feDistantLight azimuth="200" elevation="62"/></feDiffuseLighting>' +
+  '<feComposite in="SourceGraphic" in2="bump" operator="arithmetic" k1="1.12" result="lit"/><feComposite in="blot" in2="lit" operator="atop" result="b2"/>' +
+  '<feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="1" seed="2" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -.5 .28" result="gg"/><feComposite in="gg" in2="b2" operator="atop"/></filter>' +
+  /* muslin: vertical folds + fine weave */
+  '<filter id="muslin" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">' +
+  '<feTurbulence type="fractalNoise" baseFrequency="0.024 0.0016" numOctaves="3" seed="12" result="f"/>' +
+  '<feTurbulence type="turbulence" baseFrequency="0.7 0.55" numOctaves="1" seed="5" result="weave"/>' +
+  '<feComposite in="f" in2="weave" operator="arithmetic" k2="1" k3=".06" result="h"/>' +
+  '<feDiffuseLighting in="h" surfaceScale="6" lighting-color="#fff" result="L"><feDistantLight azimuth="190" elevation="58"/></feDiffuseLighting>' +
+  '<feComposite in="SourceGraphic" in2="L" operator="arithmetic" k1="1.16" result="lit"/><feComposite in="lit" in2="SourceGraphic" operator="in"/></filter>' +
+  '<filter id="muslinR" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">' +
+  '<feTurbulence type="fractalNoise" baseFrequency="0.002 0.002" numOctaves="1" seed="12" result="f"/>' +
+  '<feTurbulence type="turbulence" baseFrequency="0.7 0.55" numOctaves="1" seed="5" result="weave"/>' +
+  '<feDiffuseLighting in="weave" surfaceScale=".5" lighting-color="#fff" result="L"><feDistantLight azimuth="190" elevation="60"/></feDiffuseLighting>' +
+  '<feComposite in="SourceGraphic" in2="L" operator="arithmetic" k1="1.12" result="lit"/><feComposite in="lit" in2="SourceGraphic" operator="in"/></filter>' +
+  '<filter id="blur5" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="5"/></filter><filter id="blur2"><feGaussianBlur stdDeviation="2"/></filter><filter id="blur8" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter><filter id="blur20" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="20"/></filter>' +
+  '<radialGradient id="roomLight" cx="800" cy="600" r="980" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe2a8" stop-opacity=".55"/><stop offset=".45" stop-color="#ffcf8a" stop-opacity=".18"/><stop offset="1" stop-color="#ffcf8a" stop-opacity="0"/></radialGradient>' +
+  '<radialGradient id="roomDark" cx="800" cy="560" r="1000" gradientUnits="userSpaceOnUse"><stop offset=".28" stop-color="#2b1606" stop-opacity="0"/><stop offset=".72" stop-color="#2b1606" stop-opacity=".5"/><stop offset="1" stop-color="#140902" stop-opacity=".85"/></radialGradient>' +
+  '<radialGradient id="candleGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd58a" stop-opacity=".5"/><stop offset=".4" stop-color="#ffb860" stop-opacity=".16"/><stop offset="1" stop-color="#ffb860" stop-opacity="0"/></radialGradient>' +
+  '<radialGradient id="tentGlow" cx="800" cy="650" r="380" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffcf7e" stop-opacity=".9"/><stop offset=".55" stop-color="#ffb860" stop-opacity=".35"/><stop offset="1" stop-color="#ffb860" stop-opacity="0"/></radialGradient>' +
+  '<linearGradient id="floorShade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a220f" stop-opacity=".55"/><stop offset=".12" stop-color="#3a220f" stop-opacity=".1"/><stop offset="1" stop-color="#3a220f" stop-opacity=".35"/></linearGradient>' +
+  '<linearGradient id="wallFoot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b1606" stop-opacity="0"/><stop offset="1" stop-color="#2b1606" stop-opacity=".32"/></linearGradient>' +
+  '<linearGradient id="roofShade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3c1e" stop-opacity=".22"/><stop offset=".7" stop-color="#5a3c1e" stop-opacity="0"/><stop offset="1" stop-color="#fff6e0" stop-opacity=".12"/></linearGradient>' +
+  '<linearGradient id="wallShade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a220f" stop-opacity=".42"/><stop offset=".22" stop-color="#3a220f" stop-opacity=".08"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset=".8" stop-color="#3a220f" stop-opacity=".1"/><stop offset="1" stop-color="#3a220f" stop-opacity=".46"/></linearGradient>' +
+  '<linearGradient id="hemShade" x1="0" y1="0" x2="0" y2="1"><stop offset=".72" stop-color="#3a220f" stop-opacity="0"/><stop offset="1" stop-color="#3a220f" stop-opacity=".28"/></linearGradient>' +
+  '<linearGradient id="waxG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cdbb98"/><stop offset=".35" stop-color="#fbf2dc"/><stop offset=".7" stop-color="#efe2c4"/><stop offset="1" stop-color="#b9a47e"/></linearGradient>' +
+  '<pattern id="bricks" width="64" height="30" patternUnits="userSpaceOnUse"><rect width="64" height="30" fill="#c9b49a"/><rect x="2" y="2" width="58" height="12" rx="2" fill="#9a5a3e"/><rect x="-30" y="17" width="58" height="12" rx="2" fill="#8c4f36"/><rect x="34" y="17" width="58" height="12" rx="2" fill="#a5664a"/></pattern>';
+
+/* ── the room (opaque): wall, brick, floor, cotton, light ── */
+var room = '<g id="L-room">';
+room += '<rect width="1600" height="840" fill="#dcc5a0" filter="url(#plaster)"/>';
+/* exposed brick on the right, plaster broken away irregularly */
+room += '<g filter="url(#dropSoft)"><path d="M1600 0H1488C1470 90 1500 170 1476 260S1440 420 1470 520 1452 700 1478 840H1600Z" fill="url(#bricks)" filter="url(#brick)"/></g>';
+room += '<path d="M1488 0C1470 90 1500 170 1476 260S1440 420 1470 520 1452 700 1478 840" fill="none" stroke="#f3e6cc" stroke-width="5" opacity=".75" filter="url(#blur2)"/>';
+/* a tall sheer window drape on the left */
+room += '<g opacity=".75"><path d="M18 -10H170C150 200 176 500 150 840H8C30 500 6 200 18 -10Z" fill="#f6ecd9" filter="url(#muslin)"/></g><path d="M0 -10H24V840H0Z" fill="#3a220f" opacity=".25"/>';
+/* glow on the wall around the tent and behind the candles */
+room += '<rect width="1600" height="1000" fill="url(#roomLight)"/>';
+room += '<rect y="700" width="1600" height="140" fill="url(#wallFoot)"/>';
+/* floor: whitewashed boards in perspective */
+var floor = '<rect y="820" width="1600" height="180" fill="#d3c4a8" filter="url(#plaster)"/>', vx = 800, vy = -1400;
+for (var i = -26; i <= 26; i++) { var bx = 800 + i * 74; var tx = vx + (bx - vx) * (820 - vy) / (1000 - vy); floor += '<path d="M' + tx.toFixed(1) + ' 820L' + bx + ' 1000" stroke="#6e5638" stroke-width="2" opacity=".45"/>'; }
+floor += '<path d="M0 821H1600" stroke="#3a220f" stroke-width="5" opacity=".5" filter="url(#blur2)"/>';
+floor += '<rect y="820" width="1600" height="180" fill="url(#floorShade)"/>';
+room += floor;
+/* cotton snow spread around the tent */
+room += '<g filter="url(#dropSoft)"><g fill="#f6f1e8" filter="url(#cotton)"><path d="M140 1010C150 930 330 878 520 862S1020 848 1220 862 1520 930 1560 1010Z"/><ellipse cx="420" cy="905" rx="190" ry="40"/><ellipse cx="1180" cy="900" rx="210" ry="42"/><ellipse cx="800" cy="955" rx="420" ry="48"/></g></g>';
+var R = rnd(17);
+for (var k = 0; k < 140; k++) { var fx = R() * 1600, fy = 830 + R() * 170; room += '<circle cx="' + fx.toFixed(1) + '" cy="' + fy.toFixed(1) + '" r="' + (1 + R() * 3).toFixed(1) + '" fill="#fbf8f2" opacity="' + (0.5 + R() * 0.5).toFixed(2) + '"/>'; }
+/* soft shadow of the tent on the wall and floor */
+room += '<path d="M370 380Q800 340 1230 380V860Q800 900 370 860Z" fill="#2b1606" opacity=".42" filter="url(#blur20)" transform="translate(-26 12)"/>';
+room += '<ellipse cx="790" cy="878" rx="440" ry="34" fill="#2b1606" opacity=".22" filter="url(#blur20)"/>';
+room += '<ellipse cx="800" cy="900" rx="420" ry="70" fill="#ffd38c" opacity=".42" filter="url(#blur20)"/>';
+room += '<rect width="1600" height="1000" fill="url(#roomDark)"/>';
+room += '<g id="glows"></g>';
+room += '</g>';
+
+/* ── the tent ── */
+var P1 = [612, 92], P2 = [988, 92];
+var tentWalls = 'M400 362L404 866C470 884 520 870 600 884S700 872 800 888 940 870 1010 884 1140 870 1196 866L1200 362Q800 394 400 362Z';
+var roofPath = 'M398 364C470 340 560 250 ' + P1[0] + ' ' + P1[1] + 'C650 200 720 296 800 304C880 296 950 200 ' + P2[0] + ' ' + P2[1] + 'C1040 250 1130 340 1202 364Q800 396 398 364Z';
+var tent = '<g id="L-tent"><mask id="hole"><rect width="1600" height="1000" fill="#fff"/><rect x="' + OPEN[0] + '" y="' + (OPEN[1] - 30) + '" width="' + OPEN[2] + '" height="' + (OPEN[3] + 60) + '" fill="#000"/></mask>';
+tent += '<g mask="url(#hole)" filter="url(#dropSoft)">';
+/* walls: muslin with folds, the warm light shining through */
+tent += '<path d="' + tentWalls + '" fill="#efdfc0" filter="url(#muslin)"/>';
+tent += '<path d="' + tentWalls + '" fill="url(#tentGlow)" opacity=".85"/>';
+tent += '<path d="' + tentWalls + '" fill="url(#wallShade)"/><path d="' + tentWalls + '" fill="url(#hemShade)"/>';
+/* roof: gores of fabric gathered at the two peaks */
+tent += '<g><path d="' + roofPath + '" fill="#ead8b4" filter="url(#muslinR)"/><clipPath id="rc"><path d="' + roofPath + '"/></clipPath><g clip-path="url(#rc)">';
+tent += '<g filter="url(#blur5)">';
+[P1, P2].forEach(function (p, n) {
+  for (var j = 0; j < 9; j++) {
+    var e0 = (n ? 806 : 394) + j * 44.8, e1 = e0 + 44.8, y0 = 372 + Math.sin(j / 9 * Math.PI) * 16, y1 = 372 + Math.sin((j + 1) / 9 * Math.PI) * 16, m = (e0 + e1) / 2;
+    tent += '<path d="M' + p[0] + ' ' + p[1] + 'L' + (m - 6).toFixed(1) + ' ' + y0.toFixed(1) + 'L' + (m + 10).toFixed(1) + ' ' + y1.toFixed(1) + 'Z" fill="#6e4c2c" opacity=".38"/>';
+    tent += '<path d="M' + p[0] + ' ' + p[1] + 'L' + (e0 - 4).toFixed(1) + ' ' + y0.toFixed(1) + 'L' + (e0 + 12).toFixed(1) + ' ' + y0.toFixed(1) + 'Z" fill="#fffaf0" opacity=".55"/>';
+  }
+});
+tent += '</g>';
+tent += '<path d="' + roofPath + '" fill="url(#roofShade)"/></g></g>';
+/* inner edge of the opening: fabric thickness */
+tent += '</g>';
+tent += '<path d="M' + (OPEN[0] - 14) + ' ' + (OPEN[1] + OPEN[3] + 26) + 'V' + (OPEN[1] - 20) + 'H' + (OPEN[0] + OPEN[2] + 14) + 'V' + (OPEN[1] + OPEN[3] + 26) + '" fill="none" stroke="#2b1606" stroke-width="18" opacity=".35" filter="url(#blur8)"/>';
+/* black wire frame */
+var W = '<g filter="url(#drop)"><g fill="none" stroke="#18120d" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#iron)">';
+W += '<path d="M400 362Q800 396 1200 362"/>';
+W += '<path d="M402 362C470 338 562 248 ' + P1[0] + ' ' + P1[1] + 'M' + P1[0] + ' ' + P1[1] + 'C650 200 720 296 800 304C880 296 950 200 ' + P2[0] + ' ' + P2[1] + 'M' + P2[0] + ' ' + P2[1] + 'C1040 248 1130 338 1198 362"/>';
+W += '<path d="M' + P1[0] + ' ' + P1[1] + 'C600 200 560 300 520 378M' + P1[0] + ' ' + P1[1] + 'C640 210 680 320 706 386M' + P2[0] + ' ' + P2[1] + 'C960 210 920 320 894 386M' + P2[0] + ' ' + P2[1] + 'C1000 200 1040 300 1080 378"/>';
+W += '<path d="M402 364V866M1198 364V866M520 378V872M1080 378V872"/>';
+/* curls on the posts, like ribbon bows */
+[[520, 640], [1080, 640]].forEach(function (c) {
+  W += '<path d="M' + c[0] + ' ' + c[1] + 'c-10 -26 -44 -24 -40 0s34 14 40 0c6 14 40 24 40 0s-30 -26 -40 0M' + c[0] + ' ' + c[1] + 'l-14 34M' + c[0] + ' ' + c[1] + 'l14 34" stroke-width="4"/>';
+});
+/* flag poles */
+W += '<path d="M' + P1[0] + ' ' + P1[1] + 'V' + (P1[1] - 74) + 'M' + P2[0] + ' ' + P2[1] + 'V' + (P2[1] - 74) + '"/>';
+W += '</g>';
+[P1, P2].forEach(function (p) {
+  W += '<path d="M' + (p[0] + 2) + ' ' + (p[1] - 72) + 'c22 -12 40 4 62 -4c-8 10 -6 20 4 30c-24 8 -42 -8 -66 4Z" fill="#141010" filter="url(#iron)"/><circle cx="' + p[0] + '" cy="' + (p[1] - 76) + '" r="6" fill="#141010" filter="url(#iron)"/>';
+});
+W += '</g>';
+tent += W + '</g>';
+
+/* ── curtains (two sheer panels; the site gathers them when they open) ── */
+function curtain(x0, x1, id, flip) {
+  var d = 'M' + x0 + ' 462H' + x1 + 'V' + 868, w = x1 - x0, n = 7, s = '';
+  for (var i = 0; i <= n; i++) d += (i ? 'q' + (-w / n / 2) + ' ' + (i % 2 ? 10 : -6) + ' ' + (-w / n) + ' 0' : '');
+  d += 'Z';
+  s += '<g id="' + id + '" opacity=".93"><g filter="url(#drop)"><path d="' + d + '" fill="#f2e5cc" filter="url(#muslin)"/></g>';
+  s += '<path d="' + d + '" fill="url(#hemShade)"/>';
+  for (var r = 0; r < 6; r++) s += '<circle cx="' + (x0 + 14 + r * (w - 28) / 5) + '" cy="466" r="6" fill="none" stroke="#2a1d12" stroke-width="3"/>';
+  return s + '</g>';
+}
+var CL = [OPEN[0] - 6, 806], CR = [794, OPEN[0] + OPEN[2] + 6];
+out += '<g id="L-curtain-l">' + curtain(CL[0], CL[1], 'cl') + '</g><g id="L-curtain-r">' + curtain(CR[0], CR[1], 'cr') + '</g>';
+
+/* ── tie-backs (shown when the curtains are open) ── */
+function bow(x, y, dir) {
+  return '<g filter="url(#drop)"><path d="M' + x + ' ' + y + 'c' + (-22 * dir) + ' -26 ' + (-52 * dir) + ' -14 ' + (-40 * dir) + ' 6s' + (28 * dir) + ' 14 ' + (40 * dir) + ' -6c' + (22 * dir) + ' -26 ' + (52 * dir) + ' -14 ' + (40 * dir) + ' 6s' + (-28 * dir) + ' 14 ' + (-40 * dir) + ' -6Z" fill="#efe1c4" filter="url(#muslin)"/>' +
+    '<path d="M' + (x - 4) + ' ' + (y + 2) + 'c' + (-8 * dir) + ' 30 ' + (-2 * dir) + ' 56 ' + (-14 * dir) + ' 78l12 -2c4 -24 0 -50 8 -74Z" fill="#e6d4b2" filter="url(#muslin)"/><circle cx="' + x + '" cy="' + y + '" r="8" fill="#e8d6b4" filter="url(#wax)"/></g>';
+}
+out += '<g id="L-ties">' + bow(OPEN[0] + 34, 646, 1) + bow(OPEN[0] + OPEN[2] - 34, 646, -1) + '</g>';
+
+/* ── front: valance, rod, candelabras, a bell ── */
+var F = '<g id="L-front">';
+/* gathered valance */
+var vx0 = OPEN[0] - 32, vx1 = OPEN[0] + OPEN[2] + 32, vb = 'M' + vx0 + ' 432H' + vx1 + 'V500';
+for (var i = 0; i < 16; i++) vb += 'q' + (-(vx1 - vx0) / 32) + ' ' + (i % 2 ? 9 : 14) + ' ' + (-(vx1 - vx0) / 16) + ' 0';
+vb += 'Z';
+F += '<g filter="url(#drop)"><path d="' + vb + '" fill="#f1e2c4" filter="url(#muslin)"/></g>';
+for (var i = 0; i < 32; i++) F += '<path d="M' + (vx0 + 7 + i * (vx1 - vx0) / 32) + ' 436V' + (500 + (i % 2 ? 4 : 8)) + '" stroke="' + (i % 2 ? '#8a6a44' : '#fff8ea') + '" stroke-width="5" opacity="' + (i % 2 ? 0.25 : 0.35) + '" filter="url(#blur2)"/>';
+F += '<g filter="url(#drop)"><path d="M' + (vx0 - 10) + ' 434H' + (vx1 + 10) + '" stroke="#18120d" stroke-width="7" stroke-linecap="round" filter="url(#iron)"/><circle cx="' + (vx0 - 12) + '" cy="434" r="9" fill="#18120d" filter="url(#iron)"/><circle cx="' + (vx1 + 12) + '" cy="434" r="9" fill="#18120d" filter="url(#iron)"/></g>';
+
+function candelabra(x, base, s, arms) {
+  var g = '', jy = base - 300 * s, B = '#a77b2e';
+  /* glow on the wall behind it */
+  g += '<ellipse cx="' + x + '" cy="' + (jy - 120 * s) + '" rx="' + 210 * s + '" ry="' + 170 * s + '" fill="url(#candleGlow)"/>';
+  var metal = '';
+  /* foot */
+  metal += '<path d="M' + (x - 54 * s) + ' ' + base + 'C' + (x - 52 * s) + ' ' + (base - 26 * s) + ' ' + (x - 20 * s) + ' ' + (base - 30 * s) + ' ' + (x - 12 * s) + ' ' + (base - 52 * s) + 'H' + (x + 12 * s) + 'C' + (x + 20 * s) + ' ' + (base - 30 * s) + ' ' + (x + 52 * s) + ' ' + (base - 26 * s) + ' ' + (x + 54 * s) + ' ' + base + 'Q' + x + ' ' + (base + 12 * s) + ' ' + (x - 54 * s) + ' ' + base + 'Z" fill="' + B + '"/>';
+  /* stem with knops */
+  metal += '<rect x="' + (x - 6 * s) + '" y="' + (jy - 4 * s) + '" width="' + 12 * s + '" height="' + (base - jy - 40 * s) + '" rx="' + 5 * s + '" fill="' + B + '"/>';
+  [[0.12, 16, 9], [0.36, 12, 7], [0.55, 20, 15], [0.8, 11, 6], [0.96, 15, 8]].forEach(function (k) {
+    var ky = base - 52 * s - (base - 52 * s - jy) * k[0];
+    metal += '<ellipse cx="' + x + '" cy="' + ky + '" rx="' + k[1] * s + '" ry="' + k[2] * s + '" fill="' + B + '"/>';
+  });
+  /* arms */
+  var cups = [[0, jy - 124 * s]];
+  arms.forEach(function (a) {
+    var cx = x + a[0] * s, cy = jy - a[1] * s, dir = a[0] > 0 ? 1 : -1;
+    metal += '<path d="M' + x + ' ' + (jy + 4 * s) + 'C' + (x + a[0] * 0.2 * s) + ' ' + (jy + 40 * s) + ' ' + (x + a[0] * 0.95 * s) + ' ' + (jy + 30 * s) + ' ' + cx + ' ' + (jy - 6 * s) + 'S' + cx + ' ' + (cy + 20 * s) + ' ' + cx + ' ' + (cy + 8 * s) + '" fill="none" stroke="' + B + '" stroke-width="' + 11 * s + '" stroke-linecap="round"/>';
+    metal += '<path d="M' + (x + a[0] * 0.55 * s) + ' ' + (jy + 26 * s) + 'c' + (8 * dir * s) + ' ' + (14 * s) + ' ' + (22 * dir * s) + ' ' + (10 * s) + ' ' + (20 * dir * s) + ' ' + (-2 * s) + '" fill="none" stroke="' + B + '" stroke-width="' + 4 * s + '" stroke-linecap="round"/>';
+    cups.push([a[0], cy]);
+  });
+  cups.forEach(function (c) {
+    var cx = x + c[0] * s, cy = c[1];
+    metal += '<path d="M' + (cx - 9 * s) + ' ' + (cy + 16 * s) + 'L' + (cx - 7 * s) + ' ' + (cy + 2 * s) + 'H' + (cx + 7 * s) + 'L' + (cx + 9 * s) + ' ' + (cy + 16 * s) + 'Z" fill="' + B + '"/><ellipse cx="' + cx + '" cy="' + (cy + 2 * s) + '" rx="' + 17 * s + '" ry="' + 5 * s + '" fill="' + B + '"/>';
+  });
+  g += '<g filter="url(#dropFar)"><g filter="url(#brass)">' + metal + '</g></g>';
+  /* candles */
+  var R2 = rnd(Math.round(x));
+  cups.forEach(function (c, i) {
+    var cx = x + c[0] * s, h = (62 + R2() * 34 + (i ? 0 : 14)) * s, top = c[1] - h, w = 15 * s;
+    var cand = '<rect x="' + (cx - w / 2) + '" y="' + top + '" width="' + w + '" height="' + (h + 2 * s) + '" rx="' + 3 * s + '" fill="url(#waxG)"/>';
+    cand += '<path d="M' + (cx - w / 2) + ' ' + (top + 3 * s) + 'q' + (-2 * s) + ' ' + (14 * s) + ' ' + (1 * s) + ' ' + (22 * s) + 'q' + (3 * s) + ' ' + (-4 * s) + ' ' + (2 * s) + ' ' + (-20 * s) + 'Z" fill="#f6ecd4"/>';
+    cand += '<path d="M' + (cx + w / 2 - 2 * s) + ' ' + (top + 2 * s) + 'q' + (3 * s) + ' ' + (10 * s) + ' ' + (0) + ' ' + (14 * s) + 'q' + (-2 * s) + ' ' + (-6 * s) + ' ' + (-1 * s) + ' ' + (-14 * s) + 'Z" fill="#e8dcc0"/>';
+    g += '<g filter="url(#drop)"><g filter="url(#wax)">' + cand + '</g></g>';
+    g += '<path d="M' + cx + ' ' + top + 'v' + (-8 * s) + '" stroke="#1d140c" stroke-width="' + 2.4 * s + '" stroke-linecap="round"/>';
+    FLAMES.push([+cx.toFixed(1), +(top - 8 * s).toFixed(1), +s.toFixed(2)]);
+  });
+  return g;
+}
+F += candelabra(236, 972, 1.14, [[-104, 64], [104, 64], [-56, 92], [56, 92]]);
+F += candelabra(1380, 962, 1.2, [[-104, 64], [104, 64], [-56, 92], [56, 92]]);
+F += candelabra(1232, 992, 0.84, [[-80, 60], [80, 60]]);
+/* cotton tufts in front */
+F += '<g filter="url(#dropSoft)"><g fill="#f8f4ec" filter="url(#cotton)"><ellipse cx="150" cy="1000" rx="230" ry="44"/><ellipse cx="1440" cy="1004" rx="250" ry="46"/><ellipse cx="660" cy="1010" rx="160" ry="24"/></g></g>';
+F += '</g>';
+out = room + tent + out + F;
+/* a cotton base for the cut-out preview (only used for realm-cut) */
+out += '<g id="L-floorcut" style="display:none"></g>';
+
+document.getElementById('s').innerHTML = '<defs>' + defs + '</defs>' + out;
+/* glows behind each candle flame on the wall */
+document.getElementById('glows').innerHTML = FLAMES.map(function (f) { return '<circle cx="' + f[0] + '" cy="' + f[1] + '" r="' + 70 * f[2] + '" fill="url(#candleGlow)"/>'; }).join('');
+/* move the cut-out base behind the tent */
+var fc = document.getElementById('L-floorcut'); fc.removeAttribute('style');
+fc.innerHTML = '<g filter="url(#dropSoft)"><path d="M140 1010C150 930 330 878 520 862S1020 848 1220 862 1520 930 1560 1010Z" fill="#f4f0e8" filter="url(#cotton)"/></g>';
+document.getElementById('s').insertBefore(fc, document.getElementById('L-tent'));
+window.SCENE = { w: 1600, h: 1000, open: OPEN, flames: FLAMES,
+  crops: { curtainL: [CL[0] - 6, 456, CL[1] - CL[0] + 12, 424], curtainR: [CR[0] - 6, 456, CR[1] - CR[0] + 12, 424],
+    ties: [OPEN[0] - 20, 600, OPEN[2] + 40, 140], cut: [120, 0, 1380, 1000] } };
+</script>

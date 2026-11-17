@@ -64,13 +64,8 @@
       var on = {}; GARMENTS.forEach(function (g) { on[g.id] = g.art; });
       return svg(DOLL + on.boots + on.skirt + on.sweater + on.hat, 'sc__doll', '30 -72 240 780');
     }
-    if (slug === 'castle') {
-      return svg(castleArt() + FLAPS.concat([DOOR]).map(function (b) {
-        var r = b[2] / 2;
-        return '<path d="M' + b[0] + ' ' + (b[1] + b[3]) + 'V' + (b[1] + r) + 'a' + r + ' ' + r + ' 0 0 1 ' + b[2] + ' 0V' + (b[1] + b[3]) + 'Z" fill="#ffc65e" stroke="#5d4128" stroke-width="4"/>';
-      }).join(''), 'sc__castle', '0 0 1000 770');
-    }
-    if (slug === 'shadowrealm') return svg(tentBack() + tentFront(), 'sc__tent', '0 0 1000 780');
+    if (slug === 'castle') return h('img', { src: 'media/scene/castle-cut.webp', alt: '', draggable: 'false' });
+    if (slug === 'shadowrealm') return h('img', { src: 'media/scene/realm-cut.webp', alt: '', draggable: 'false' });
     return null;
   }
   function scatter(R) {
@@ -451,73 +446,14 @@
   };
 
   /* ── 04 CARDBOARD CASTLE ─────────────────────────────────────────────────
-     The castle is one drawing; the six windows and the door are flaps laid
-     over it that swing open. What is behind each one comes from content.js.  */
-  var CB = { base: '#c79f72', lite: '#d9b88f', shade: '#b28a5f', dark: '#7c5b3c', ink: '#5d4128', hole: '#3a2716' };
-  function merlons(x0, x1, y, w, gap, tall) {       /* a crenellated top edge, as a closed strip */
-    var d = 'M' + x0 + ' ' + (y + 2) + 'V' + (y - tall), x = x0;
-    while (x + w <= x1 + 0.5) {
-      d += 'H' + (x + w) + 'V' + y;
-      x += w + gap;
-      if (x + w <= x1 + 0.5) d += 'H' + x + 'V' + (y - tall);
-    }
-    return d + 'H' + x1 + 'V' + (y + 2) + 'Z';
-  }
-  function bricks(list) {                           /* marker-drawn brick lines: [x, y, length] */
-    return '<path class="cb-ink" d="' + list.map(function (b) { return 'M' + b[0] + ' ' + b[1] + 'h' + b[2]; }).join('') + '"/>';
-  }
-  function tower(cx, flag) {                        /* one of the two side towers */
-    var x = cx - 80;
-    return '<g class="cb-layer">' +
-      '<path class="cb-pole" d="M' + cx + ' 152V104"/><path d="M' + (cx + 2) + ' 106l52 13-52 15Z" fill="' + flag + '"/>' +
-      '<path d="M' + cx + ' 146L' + (cx + 100) + ' 262H' + (cx - 100) + 'Z" fill="' + CB.shade + '"/>' +
-      '<path class="cb-ink" d="M' + cx + ' 150L' + (cx - 34) + ' 258M' + cx + ' 150L' + (cx + 34) + ' 258M' + cx + ' 150L' + (cx - 72) + ' 258M' + cx + ' 150L' + (cx + 72) + ' 258"/>' +
-      '<rect x="' + (cx - 104) + '" y="258" width="208" height="20" fill="url(#cb-edge)"/>' +
-      '<rect x="' + x + '" y="278" width="160" height="414" fill="' + CB.base + '"/><rect x="' + x + '" y="278" width="160" height="414" fill="url(#cb-flute)"/>' +
-      '<rect x="' + (cx - 7) + '" y="560" width="14" height="62" rx="7" fill="' + CB.hole + '"/><rect x="' + (cx - 18) + '" y="584" width="36" height="10" rx="5" fill="' + CB.hole + '"/>' +
-      bricks([[x + 10, 300, 34], [x + 112, 306, 38], [x + 16, 446, 40], [x + 96, 462, 46], [x + 30, 470, 30], [x + 104, 650, 40], [x + 12, 664, 44]]) +
-      '</g>';
-  }
-  function castleArt() {
-    return '<defs>' +
-      '<pattern id="cb-flute" width="7" height="7" patternUnits="userSpaceOnUse"><path d="M3.5 0V7" stroke="#000" stroke-opacity=".06" stroke-width="2"/></pattern>' +
-      '<pattern id="cb-edge" width="9" height="20" patternUnits="userSpaceOnUse"><rect width="9" height="20" fill="#8c6744"/><path d="M0 3h9M0 17h9" stroke="' + CB.lite + '" stroke-width="2.4"/><path d="M0 14Q2.25 4 4.5 10T9 6" stroke="' + CB.lite + '" stroke-width="1.5" fill="none"/></pattern>' +
-      '<filter id="cb-grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="1.15" numOctaves="2" seed="7"/><feColorMatrix type="saturate" values="0"/>' +
-      '<feComponentTransfer><feFuncA type="table" tableValues="0 .34"/></feComponentTransfer><feComposite operator="in" in2="SourceGraphic" result="n"/><feBlend mode="multiply" in="n" in2="SourceGraphic"/></filter>' +
-      '</defs>' +
-      '<g filter="url(#cb-grain)">' +
-      /* the sheet it stands on */
-      '<g class="cb-layer"><path d="M46 690H954L1000 746H0Z" fill="' + CB.lite + '"/><rect y="746" width="1000" height="16" fill="url(#cb-edge)"/>' +
-      '<path class="cb-ink" d="M90 716h70M800 712h96M420 726h150"/></g>' +
-      /* the tall tower at the back */
-      '<g class="cb-layer"><path class="cb-pole" d="M500 48V8"/><path d="M502 10l60 15-60 16Z" fill="#d42b2b"/>' +
-      '<path d="M500 44L606 150H394Z" fill="' + CB.shade + '"/><path class="cb-ink" d="M500 48L466 146M500 48L534 146M500 48L428 146M500 48L572 146"/>' +
-      '<rect x="388" y="146" width="224" height="20" fill="url(#cb-edge)"/>' +
-      '<rect x="412" y="166" width="176" height="330" fill="' + CB.base + '"/><rect x="412" y="166" width="176" height="330" fill="url(#cb-flute)"/>' +
-      bricks([[424, 186, 30], [548, 198, 30], [420, 250, 32], [546, 272, 34]]) + '</g>' +
-      /* the wall */
-      '<g class="cb-layer"><path d="' + merlons(240, 760, 446, 40, 30, 30) + '" fill="' + CB.lite + '"/>' +
-      '<rect x="240" y="446" width="520" height="246" fill="' + CB.lite + '"/><rect x="240" y="446" width="520" height="246" fill="url(#cb-flute)"/>' +
-      bricks([[320, 470, 44], [344, 640, 40], [316, 656, 30], [640, 474, 40], [626, 644, 46], [660, 660, 28]]) +
-      /* a shipping label someone forgot to peel off */
-      '<g transform="rotate(-3 655 640)"><rect x="622" y="622" width="66" height="40" fill="#f4f1ea"/><path d="M628 632h40M628 640h54M628 648h30" stroke="#8a8a8a" stroke-width="2.4"/><path d="M670 646h3v10h-3zM675 646h1.5v10h-1.5zM678 646h4v10h-4z" fill="#2a2a2a"/></g></g>' +
-      /* the two towers */
-      tower(225, '#1c1ce6') + tower(775, '#1c1ce6') +
-      /* "this way up" and "fragile", printed on the boxes it was cut from */
-      '<g fill="none" stroke="' + CB.dark + '" stroke-width="5" opacity=".62" stroke-linejoin="round"><path d="M178 520v-52M164 484l14-18 14 18M222 520v-52M208 484l14-18 14 18M158 532h84"/></g>' +
-      '<g transform="translate(838 548) rotate(-90)" opacity=".62"><rect x="-4" y="-25" width="124" height="33" fill="none" stroke="' + CB.dark + '" stroke-width="3.4"/><text x="58" y="0" text-anchor="middle" font-family="Geist Mono, monospace" font-weight="700" font-size="21" letter-spacing="3" fill="' + CB.dark + '">FRAGILE</text></g>' +
-      /* the gatehouse */
-      '<g class="cb-layer"><path d="' + merlons(392, 608, 344, 36, 24, 28) + '" fill="' + CB.base + '"/>' +
-      '<rect x="392" y="344" width="216" height="348" fill="' + CB.base + '"/><rect x="392" y="344" width="216" height="348" fill="url(#cb-flute)"/>' +
-      '<path d="M428 692V530a72 72 0 0 1 144 0V692Z" fill="' + CB.shade + '"/><path d="M440 692V530a60 60 0 0 1 120 0V692Z" fill="' + CB.hole + '"/>' +
-      '<path class="cb-ink" d="M428 600h-20M428 560h-16M572 600h20M572 560h16M446 478l-12-12M554 478l12-12M500 458v-16"/></g>' +
-      /* packing tape holding it together */
-      '<g fill="#e8dbb4" opacity=".86"><rect x="278" y="436" width="62" height="20" transform="rotate(-5 309 446)"/><rect x="662" y="434" width="64" height="20" transform="rotate(4 694 444)"/><rect x="372" y="398" width="46" height="18" transform="rotate(-82 395 407)"/><rect x="118" y="672" width="70" height="20" transform="rotate(3 153 682)"/></g>' +
-      '</g>';
-  }
-  /* where the flaps sit on the drawing: [x, y, width, height] in drawing units (1000 × 770) */
-  var FLAPS = [[189, 318, 72, 102], [464, 196, 72, 102], [739, 318, 72, 102], [300, 518, 66, 92], [467, 366, 66, 84], [634, 518, 66, 92]];
-  var DOOR = [440, 470, 120, 222];
+     The castle is a clay model on a little set. The picture is baked from
+     tools/scenes/castle.html (python3 tools/bake_scenes.py castle); the six
+     windows and the door are shutters laid over it that swing open. Their
+     boxes below are in the picture's own units (1200 × 900) and must match
+     the WIN and DOOR lists in that file. What is behind each comes from content.js. */
+  var SET = { w: 1200, h: 900 };
+  var FLAPS = [[328, 462, 64, 88], [568, 318, 64, 88], [808, 462, 64, 88], [458, 612, 58, 80], [574, 528, 52, 70], [684, 612, 58, 80]];
+  var DOOR = [562, 640, 76, 132];
 
   toys.castle = function (p, idx) {
     var K = C.random.castle, rooms = K.rooms.slice(0, FLAPS.length + 1);
@@ -534,7 +470,8 @@
         room.img && SPA.info(room.img) ? SPA.img(room.img, { alt: '' }) : h('b', room.label));
       var b = h('button.flap' + (isDoor ? '.flap--door' : ''), { type: 'button', 'aria-expanded': 'false',
         'aria-label': (isDoor ? 'The door' : 'Window ' + (n + 1)) + '. Open it.',
-        style: { left: pct(box[0], 1000), top: pct(box[1], 770), width: pct(box[2], 1000), height: pct(box[3], 770) },
+        style: { left: pct(box[0], SET.w), top: pct(box[1], SET.h), width: pct(box[2], SET.w), height: pct(box[3], SET.h),
+          '--arch': (box[2] / 2 / box[3] * 100).toFixed(2) + '%' },
         onclick: function () { var on = !open[n]; setOpen(b, on); show(on ? b : lastOpen()); } },
         inside, h('span.flap__leaf.flap__leaf--l'), h('span.flap__leaf.flap__leaf--r'));
       b._room = room; b._n = n; b._door = isDoor;
@@ -568,7 +505,7 @@
       tag.classList.add('is-in');
     }
 
-    var castle = h('div.castle', svg(castleArt(), 'castle__art', '0 0 1000 770'),
+    var castle = h('div.castle', h('img.castle__art', { src: 'media/scene/castle-set.webp', alt: 'A clay castle with rose-pink roofs on a grassy hill at dusk, a paper moon and stars hanging above.', width: 2200, height: 1650, draggable: 'false' }),
       winRooms.map(function (r, n) { return flap(r, FLAPS[n], false, n); }),
       doorRoom ? flap(doorRoom, DOOR, true, winRooms.length) : null);
     setOpen(flaps[0], false); show(null);
@@ -578,52 +515,65 @@
   };
 
   /* ── 05 SHADOWREALM ──────────────────────────────────────────────────────
-     A tent drawn in two layers (back and front) with a small canvas in the
-     opening. The play is drawn eight times a second and nothing moves in
-     between, which is what makes it read as stop-motion. Three short acts:
-     the fair, the forest, the sea. The cursor moves the lamp.               */
-  function candelabra(x) {
-    var c = '', f = '';
-    [[-40, 606, 22], [40, 606, 22], [-22, 586, 20], [22, 586, 20], [0, 590, 24]].forEach(function (k, i) {
-      c += '<rect x="' + (k[0] - 3) + '" y="' + (k[1] - k[2]) + '" width="6" height="' + k[2] + '" rx="1.5" fill="#efe6d0"/>';
-      f += '<circle class="tn-halo" cx="' + k[0] + '" cy="' + (k[1] - k[2] - 8) + '" r="15"/><ellipse class="tn-flame" style="animation-delay:-' + (i * 0.37).toFixed(2) + 's" cx="' + k[0] + '" cy="' + (k[1] - k[2] - 8) + '" rx="3.4" ry="7.5"/>';
-    });
-    return '<g transform="translate(' + x + ' 0)"><path d="M0 746V590M-32 746H32M-20 746q20-18 40 0M0 640q-40 0-40-34M0 640q40 0 40-34M0 616q-22 0-22-30M0 616q22 0 22-30" fill="none" stroke="#b8923e" stroke-width="4.5" stroke-linecap="round"/>' + c + f + '</g>';
+     The room, tent, curtains and candelabras are baked from
+     tools/scenes/realm.html (python3 tools/bake_scenes.py realm). Live on
+     top: the faint carousel shadow on the wall, the shadow play in the tent
+     opening (eight frames a second, so it reads as stop-motion), the curtains
+     and the candle flames. Sizes are in the picture's units (1600 × 1000).  */
+  var ROOM = { w: 1600, h: 1000, open: [590, 470, 420, 380],
+    curtainL: [578, 456, 234, 424], curtainR: [788, 456, 234, 424], ties: [570, 600, 460, 140],
+    flames: [[236, 392.8, 1.14], [117.4, 475.6, 1.14], [354.6, 464.7, 1.14], [172.2, 436, 1.14], [299.8, 416.9, 1.14], [1380, 352, 1.2], [1255.2, 419.9, 1.2], [1504.8, 411.2, 1.2], [1312.8, 369.4, 1.2], [1447.2, 398.7, 1.2], [1232, 565, 0.84], [1164.8, 629.2, 0.84], [1299.2, 604.9, 0.84]] };
+  function box(b) {
+    return { left: (b[0] / ROOM.w * 100).toFixed(3) + '%', top: (b[1] / ROOM.h * 100).toFixed(3) + '%',
+      width: (b[2] / ROOM.w * 100).toFixed(3) + '%', height: (b[3] / ROOM.h * 100).toFixed(3) + '%' };
   }
-  function scallops(x0, x1, y, drop) {
-    var n = Math.round((x1 - x0) / 28), w = (x1 - x0) / n, d = 'M' + x0 + ' 318H' + x1 + 'V' + y;
-    for (var i = 0; i < n; i++) d += 'q' + (-w / 2) + ' ' + drop + ' ' + (-w) + ' 0';
-    return d + 'Z';
-  }
-  function tentBack() {
-    return '<defs>' +
-      '<radialGradient id="tn-glow" cx="500" cy="510" r="500" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffdc94"/><stop offset=".36" stop-color="#f0c88c"/><stop offset=".7" stop-color="#c39b68"/><stop offset="1" stop-color="#6f5333"/></radialGradient>' +
-      '<linearGradient id="tn-roof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d5435"/><stop offset=".7" stop-color="#b9976a"/><stop offset="1" stop-color="#dcbd8c"/></linearGradient>' +
-      '<pattern id="tn-folds" width="48" height="10" patternUnits="userSpaceOnUse"><path d="M12 0V10" stroke="#4a2f12" stroke-opacity=".17" stroke-width="3"/><path d="M33 0V10" stroke="#fff" stroke-opacity=".1" stroke-width="6"/></pattern>' +
-      '</defs>' +
-      '<ellipse cx="500" cy="728" rx="496" ry="44" fill="#e8dfcc" opacity=".13"/>' +
-      '<path d="M330 80V14M670 80V14" stroke="#0b0b0b" stroke-width="4" stroke-linecap="round"/>' +
-      '<path class="tn-flag" d="M332 16q20-11 38 0t38-2v32q-19 7-38-1t-38 4Z"/><path class="tn-flag" d="M672 16q20-11 38 0t38-2v32q-19 7-38-1t-38 4Z"/>' +
-      '<path d="M96 318Q240 262 330 76Q396 252 500 264Q604 252 670 76Q760 262 904 318Z" fill="url(#tn-roof)"/>' +
-      '<path d="M330 76Q304 250 214 304M330 76Q350 244 424 296M670 76Q650 244 576 296M670 76Q696 250 786 304" fill="none" stroke="#3d2710" stroke-opacity=".34" stroke-width="2"/>' +
-      '<path d="M96 318H904V702Q500 744 96 702Z" fill="url(#tn-glow)"/><path d="M96 318H904V702Q500 744 96 702Z" fill="url(#tn-folds)"/>' +
-      /* the shadow of a bird that got in */
-      '<path d="M176 470q14-16 26-4q8-14 24-10q-14 4-16 16q16 4 22 18q-14-8-26-4q-4 12-16 14q4-10 0-18q-10-6-14-12Z" fill="#4a2c0e" opacity=".32" filter="blur(2px)"/>' +
-      /* the wire frame */
-      '<path d="M96 318V706M904 318V706M96 318Q240 262 330 76Q396 252 500 264Q604 252 670 76Q760 262 904 318M96 318H904" fill="none" stroke="#0b0b0b" stroke-width="3.6" stroke-linejoin="round"/>' +
-      '<path d="M800 500q-20-22-25 0q5 22 25 0q20-22 25 0q-5 22-25 0M800 500v44" fill="none" stroke="#0b0b0b" stroke-width="3"/>' +
-      '<rect x="298" y="336" width="404" height="366" fill="#1a0c04"/>';
-  }
-  function tentFront() {
-    var drape = 'V698q-12.6 10-25.25 0t-25.25 0-25.25 0-25.25 0-25.25 0-25.25 0-25.25 0-25.25 0Z';
-    return '<defs><pattern id="tn-drape" width="50" height="10" patternUnits="userSpaceOnUse"><rect width="50" height="10" fill="#e4cfa6"/><rect x="16" width="12" height="10" fill="#c5a97c"/><rect x="36" width="7" height="10" fill="#f4e6c6"/><rect x="2" width="3" height="10" fill="#d3ba8e"/></pattern></defs>' +
-      '<g class="tn-curtain tn-curtain--l"><path d="M298 336H500' + drape + '" fill="url(#tn-drape)" stroke="#3d2710" stroke-width="1.5"/></g>' +
-      '<g class="tn-curtain tn-curtain--r"><path d="M500 336H702' + drape + '" fill="url(#tn-drape)" stroke="#3d2710" stroke-width="1.5"/></g>' +
-      '<path class="tn-tie" d="M318 520q-22-16-22 4q0 18 22-4q26 12 26-6q0-16-26 6M682 520q22-16 22 4q0 18-22-4q-26 12-26-6q0-16 26 6" fill="#e4cfa6" stroke="#3d2710" stroke-width="2"/>' +
-      '<path d="M298 318V706M702 318V706" fill="none" stroke="#0b0b0b" stroke-width="4"/>' +
-      '<path d="' + scallops(276, 724, 352, 20) + '" fill="#dcc294" stroke="#3d2710" stroke-width="1.6"/>' +
-      '<path d="M276 318H724" stroke="#0b0b0b" stroke-width="4"/>' +
-      candelabra(52) + candelabra(948);
+
+  /* the shadow of a slow carousel thrown across the wall behind the tent */
+  function carouselShadow(canvas) {
+    var W = 400, H = 250, ctx = canvas.getContext('2d'), raf = 0, last = 0, a = 0;
+    canvas.width = W; canvas.height = H;
+    function horse(x, y, s, dir) {
+      ctx.save(); ctx.translate(x, y); ctx.scale(s * dir, s);
+      ctx.beginPath(); ctx.ellipse(0, 0, 10, 4.6, 0, 0, 6.2832); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(6, -3); ctx.lineTo(11, -12); ctx.lineTo(16, -13); ctx.lineTo(18, -9); ctx.lineTo(14, -7); ctx.lineTo(11, -1); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(-9, -2); ctx.lineTo(-16, 3); ctx.lineTo(-13, -5); ctx.fill();
+      ctx.lineWidth = 1.8; ctx.beginPath();
+      ctx.moveTo(6, 3); ctx.lineTo(12, 7); ctx.lineTo(14, 11); ctx.moveTo(4, 3); ctx.lineTo(4, 12);
+      ctx.moveTo(-6, 3); ctx.lineTo(-11, 8); ctx.lineTo(-14, 11); ctx.moveTo(-4, 3); ctx.lineTo(-2, 12); ctx.stroke();
+      ctx.restore();
+    }
+    function draw() {
+      var cx = 200, top = 22, eave = 58, i, n = 8;
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, W, H);
+      ctx.filter = 'blur(1.4px)';
+      ctx.fillStyle = ctx.strokeStyle = '#3a1f0b'; ctx.lineCap = 'round';
+      /* finial, pennant and the canopy with its scalloped fringe */
+      ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx, 4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, 4); ctx.lineTo(cx + 12 + Math.sin(a * 9) * 2, 7); ctx.lineTo(cx, 10); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx, top); ctx.quadraticCurveTo(cx - 70, 30, cx - 172, eave); ctx.lineTo(cx + 172, eave); ctx.quadraticCurveTo(cx + 70, 30, cx, top); ctx.fill();
+      for (i = 0; i < 18; i++) { ctx.beginPath(); ctx.arc(cx - 172 + 9.55 + i * 19.1, eave, 9.55, 0, Math.PI); ctx.fill(); }
+      ctx.fillRect(cx - 168, eave - 2, 336, 6);
+      /* the centre column and the platform */
+      ctx.fillRect(cx - 6, eave, 12, 150);
+      ctx.beginPath(); ctx.ellipse(cx, 208, 176, 9, 0, 0, 6.2832); ctx.fill();
+      /* poles and horses going round */
+      var list = [];
+      for (i = 0; i < n; i++) { var t = a + (i * 6.2832) / n; list.push([Math.cos(t), cx + Math.sin(t) * 150, Math.sin(t * 3 + i) * 9, Math.cos(t) >= 0 ? 1 : -1]); }
+      list.forEach(function (q) {
+        var sc = 1.05 + q[0] * 0.18;
+        ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(q[1], eave + 6); ctx.lineTo(q[1], 204); ctx.stroke();
+        horse(q[1], 134 + q[2], sc * 1.5, q[3]);
+      });
+      ctx.filter = 'none';
+    }
+    function loop(now) {
+      raf = requestAnimationFrame(loop);
+      if (now - last < 40) return;
+      a += (now - last) * 0.00016; last = now; draw();
+    }
+    draw();
+    if (!REDUCE) raf = requestAnimationFrame(function (n) { last = n; loop(n); });
+    return function () { cancelAnimationFrame(raf); };
   }
 
   function shadowPlay(canvas, onAct) {
@@ -908,11 +858,26 @@
       play.open(on); label(now);
     }
     var now = 0;
+    var shadowWall = h('canvas.tent__carousel', { 'aria-hidden': 'true' });
+    canvas.setAttribute('style', Object.keys(box(ROOM.open)).map(function (k) { return k + ':' + box(ROOM.open)[k]; }).join(';'));
+    function layer(file, cls, b) {
+      return h('img.tent__layer' + (cls ? '.' + cls : ''), { src: 'media/scene/' + file + '.webp', alt: '', draggable: 'false', style: b ? box(b) : null });
+    }
+    var flames = h('div.tent__flames', { 'aria-hidden': 'true' }, ROOM.flames.map(function (f, i) {
+      return h('span.flame', { style: { left: (f[0] / ROOM.w * 100).toFixed(3) + '%', top: (f[1] / ROOM.h * 100).toFixed(3) + '%', '--s': f[2], '--d': (-(i * 0.37) % 1.3).toFixed(2) + 's' } }, h('i'));
+    }));
     var tent = h('div.tent',
-      svg(tentBack(), 'tent__art', '0 0 1000 780'),
+      h('img.tent__layer.tent__room', { src: 'media/scene/realm-room.webp', alt: 'A dim room with a plaster wall, cotton snow on the floor, a muslin tent on a black wire frame and three brass candelabras.', draggable: 'false' }),
+      shadowWall,
       canvas,
-      svg(tentFront(), 'tent__art tent__art--front', '0 0 1000 780'),
+      layer('realm-tent', 'tent__body'),
+      layer('realm-curtain-l', 'tent__curtain tent__curtain--l', ROOM.curtainL),
+      layer('realm-curtain-r', 'tent__curtain tent__curtain--r', ROOM.curtainR),
+      layer('realm-ties', 'tent__ties', ROOM.ties),
+      layer('realm-front', 'tent__front'),
+      flames,
       h('button.tent__hit', { type: 'button', 'aria-label': 'The tent opening. Press to pull the curtain, or to skip to the next act.',
+        style: box([ROOM.open[0], ROOM.open[1] - 30, ROOM.open[2], ROOM.open[3] + 30]),
         onclick: function () { if (!tent.classList.contains('is-open')) pull(true); else play.next(); } }));
     var stage = h('div.sr', tent, h('div.sr__bar', curtain, caption, h('span.sr__dots', dots)));
     stage.addEventListener('pointermove', function (e) {
@@ -922,6 +887,7 @@
     requestAnimationFrame(function () {
       if (!stage.isConnected) return;
       play = shadowPlay(canvas, function (i) { now = i; label(i); });
+      SPA.onLeave(carouselShadow(shadowWall));
       SPA.onLeave(play.stop);
       SPA.shadow = play;
       pull(false);

@@ -1,0 +1,151 @@
+<!doctype html><meta charset="utf-8"><title>castle set</title>
+<style>html,body{margin:0;background:transparent}svg{display:block}</style>
+<svg id="s" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900"></svg>
+<script src="common.js"></script>
+<script>
+/* The cardboard castle, rebuilt as a clay / papier-mâché model on a little set.
+   Windows (in the order the site uses them): left tower, keep, right tower,
+   wall left, gatehouse, wall right, then the door. */
+var WIN = [[328, 462, 64, 88], [568, 318, 64, 88], [808, 462, 64, 88], [458, 612, 58, 80], [574, 528, 52, 70], [684, 612, 58, 80]];
+var DOOR = [562, 640, 76, 132];
+var R = rnd(11);
+var defs = '', out = '';
+defs += clay('clay', { dents: 0.15, df: 0.022, grain: 0.07 });
+defs += '<filter id="dof"><feGaussianBlur stdDeviation="1.6"/></filter><linearGradient id="haze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3c7a6" stop-opacity="0"/><stop offset=".6" stop-color="#f3c7a6" stop-opacity=".32"/><stop offset="1" stop-color="#f3c7a6" stop-opacity="0"/></linearGradient>';
+defs += clay('claySoft', { blur: 9, surface: 4, wobble: 9, dents: 0.12 });
+defs += clay('clayRoof', { blur: 5, surface: 6, wobble: 6, spec: 0.35, seed: 7 });
+defs += clay('claySmall', { blur: 2.4, surface: 3, wobble: 3, wf: 0.03, dents: 0.05, spec: 0.4, pad: 30 });
+defs += clay('clayHill', { blur: 14, surface: 4, wobble: 12, wf: 0.006, dents: 0.16, df: 0.018, spec: 0.12, seed: 21 });
+defs += clay('clayCloud', { blur: 12, surface: 4.5, wobble: 10, wf: 0.01, dents: 0.08, spec: 0.18, el: 58, seed: 31, pad: 14 });
+defs += shadowF('drop', -6, 9, 7, 0.35) + shadowF('dropSoft', -4, 6, 10, 0.25) + shadowF('dropBig', -10, 14, 14, 0.3);
+/* backdrop: painted canvas */
+defs += '<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#23284a"/><stop offset=".38" stop-color="#4b4a78"/><stop offset=".66" stop-color="#a07c98"/><stop offset=".86" stop-color="#e3ad92"/><stop offset="1" stop-color="#f0c79e"/></linearGradient>' +
+  '<filter id="canvas" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9 0.85" numOctaves="2" seed="4" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.9 0.62" result="g"/>' +
+  '<feTurbulence type="fractalNoise" baseFrequency="0.004 0.012" numOctaves="3" seed="8" result="m"/><feColorMatrix in="m" type="matrix" values="0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .9  0 0 0 -.7 .3" result="mm"/>' +
+  '<feComposite in="g" in2="SourceGraphic" operator="in" result="gi"/><feBlend in="gi" in2="SourceGraphic" mode="multiply" result="a"/><feComposite in="mm" in2="SourceGraphic" operator="in" result="mi"/><feBlend in="mi" in2="a" mode="screen"/></filter>' +
+  '<radialGradient id="glowWin" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffcf7a" stop-opacity=".75"/><stop offset=".45" stop-color="#ffb04a" stop-opacity=".25"/><stop offset="1" stop-color="#ff9a30" stop-opacity="0"/></radialGradient>' +
+  '<radialGradient id="key" cx="22%" cy="18%" r="95%"><stop offset="0" stop-color="#fff2d6" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></radialGradient>' +
+  '<radialGradient id="vig" cx="50%" cy="48%" r="72%"><stop offset=".55" stop-color="#1a0d18" stop-opacity="0"/><stop offset="1" stop-color="#1a0d18" stop-opacity=".55"/></radialGradient>' +
+  '<linearGradient id="cyl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5e3d2a" stop-opacity=".42"/><stop offset=".28" stop-color="#fff" stop-opacity=".12"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset=".86" stop-color="#4a2c1a" stop-opacity=".3"/><stop offset="1" stop-color="#3a2014" stop-opacity=".5"/></linearGradient>' +
+  '<linearGradient id="cylRoof" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a1f22" stop-opacity=".3"/><stop offset=".3" stop-color="#fff" stop-opacity=".14"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#3a1418" stop-opacity=".45"/></linearGradient>' +
+  '<pattern id="stones" width="46" height="26" patternUnits="userSpaceOnUse"><rect width="46" height="26" fill="#e9d8ba"/><path d="M0 .5H46M0 13.5H46M12 0V13M35 13V26" stroke="#ad9270" stroke-width="2.6" opacity=".38"/><rect x="14" y="2" width="19" height="10" rx="4" fill="#f3e5cc" opacity=".55"/><rect x="2" y="15" width="31" height="10" rx="4" fill="#dcc6a2" opacity=".4"/><path d="M3 4h7M20 18h9" stroke="#fff6e4" stroke-width="2" opacity=".5"/></pattern>' +
+  '<pattern id="shingles" width="20" height="15" patternUnits="userSpaceOnUse"><rect width="20" height="15" fill="#cf9496"/><path d="M0 0a10 10 0 0 0 20 0M-10 7.5a10 10 0 0 0 20 0M10 7.5a10 10 0 0 0 20 0" fill="none" stroke="#a46467" stroke-width="2"/><circle cx="6" cy="4" r="1.6" fill="#e8b4b2" opacity=".7"/></pattern>' +
+  '<pattern id="planks" width="14" height="30" patternUnits="userSpaceOnUse"><rect width="14" height="30" fill="#8a5636"/><path d="M13 0V30" stroke="#5a321c" stroke-width="2.4"/><path d="M4 3v10M8 16v9" stroke="#a46a44" stroke-width="1.6"/></pattern>';
+
+/* ── backdrop ── */
+out += '<g id="L-sky"><rect width="1200" height="900" fill="url(#sky)" filter="url(#canvas)"/>';
+for (var i = 0; i < 70; i++) { var x = R() * 1200, y = R() * 430, r = 0.6 + R() * 1.6; out += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2) + '" fill="#fff5d8" opacity="' + (0.35 + R() * 0.5).toFixed(2) + '"/>'; }
+out += '</g>';
+/* hanging moon and stars on threads */
+var STAR = 'M16 1C17.2 10.5 21.5 14.8 31 16C21.5 17.2 17.2 21.5 16 31C14.8 21.5 10.5 17.2 1 16C10.5 14.8 14.8 10.5 16 1Z';
+function hangStar(x, y, s, col) { return '<path d="M' + x + ' -4V' + (y - 16 * s) + '" stroke="#f3e2c0" stroke-width="1.2" opacity=".55"/><g filter="url(#drop)"><path transform="translate(' + (x - 16 * s) + ' ' + (y - 16 * s) + ') scale(' + s + ')" d="' + STAR + '" fill="' + col + '" filter="url(#claySmall)"/></g>'; }
+out += '<g id="L-hang">' +
+  '<path d="M1012 -4V92" stroke="#f3e2c0" stroke-width="1.4" opacity=".6"/>' +
+  '<g filter="url(#dropSoft)"><path d="M1012 92a62 62 0 1 0 50 98a52 52 0 1 1 -50 -98Z" transform="rotate(-14 1012 150)" fill="#f2dc9c" filter="url(#claySoft)"/></g>' +
+  hangStar(150, 120, 1.5, '#f0cf7e') + hangStar(250, 210, 0.95, '#e9c06a') + hangStar(880, 90, 1.1, '#f0cf7e') + hangStar(1120, 300, 0.9, '#e9c06a') + hangStar(70, 300, 0.75, '#e9c06a') +
+  '</g>';
+/* clouds */
+function cloud(x, y, s, col) {
+  var c = '';
+  [[0, 0, 46], [44, -16, 40], [84, 2, 44], [-38, 10, 30], [120, 14, 30], [30, 18, 42]].forEach(function (k) { c += '<circle cx="' + (x + k[0] * s) + '" cy="' + (y + k[1] * s) + '" r="' + k[2] * s + '"/>'; });
+  return '<g filter="url(#dropSoft)"><g fill="' + col + '" filter="url(#clayCloud)">' + c + '<rect x="' + (x - 38 * s) + '" y="' + y + '" width="' + 158 * s + '" height="' + 40 * s + '" rx="' + 20 * s + '"/></g></g>';
+}
+out += '<g id="L-clouds" filter="url(#dof)">' + cloud(150, 420, 1.05, '#d8c4d6') + cloud(930, 470, 1.25, '#e2cdd8') + cloud(1040, 230, 0.6, '#cdb9d2') + '</g>';
+/* hills */
+out += '<g id="L-hills" filter="url(#dof)">' +
+  '<g filter="url(#dropSoft)"><path d="M-30 900V610C80 560 170 575 260 600S430 640 520 612 700 560 820 590 1010 640 1100 600 1230 580 1230 580V900Z" fill="#8f86ad" filter="url(#clayHill)"/></g>' +
+  '<g filter="url(#dropSoft)"><path d="M-30 900V680C60 650 160 640 240 668S380 712 470 700 640 660 760 676 980 720 1080 690 1230 670 1230 670V900Z" fill="#7d946a" filter="url(#clayHill)"/></g>' +
+  '</g>';
+/* little trees on the hills */
+function tree(x, y, s, col) { return '<g filter="url(#dropSoft)"><path d="M' + (x - 3 * s) + ' ' + y + 'h' + 6 * s + 'v' + (-24 * s) + 'h' + (-6 * s) + 'Z" fill="#6a4a32" filter="url(#claySmall)"/><ellipse cx="' + x + '" cy="' + (y - 40 * s) + '" rx="' + 20 * s + '" ry="' + 28 * s + '" fill="' + col + '" filter="url(#claySmall)"/></g>'; }
+out += '<rect id="L-haze" x="0" y="520" width="1200" height="240" fill="url(#haze)"/><g id="L-trees">' + tree(110, 690, 1.3, '#5f7d4e') + tree(160, 700, 0.9, '#6f8c58') + tree(1040, 712, 1.2, '#5f7d4e') + tree(1100, 700, 0.85, '#71905a') + tree(960, 716, 0.7, '#6a8a56') + '</g>';
+
+/* ── the castle ── */
+function cone(cx, apex, base, hw) {
+  return 'M' + (cx - hw) + ' ' + base + 'C' + (cx - hw * 0.55) + ' ' + (base - (base - apex) * 0.22) + ' ' + (cx - hw * 0.18) + ' ' + (base - (base - apex) * 0.62) + ' ' + cx + ' ' + apex +
+    'C' + (cx + hw * 0.18) + ' ' + (base - (base - apex) * 0.62) + ' ' + (cx + hw * 0.55) + ' ' + (base - (base - apex) * 0.22) + ' ' + (cx + hw) + ' ' + base +
+    'Q' + cx + ' ' + (base + hw * 0.22) + ' ' + (cx - hw) + ' ' + base + 'Z';
+}
+function roof(cx, apex, base, hw, flag) {
+  return '<g filter="url(#drop)"><g filter="url(#clayRoof)"><path d="' + cone(cx, apex, base, hw) + '" fill="url(#shingles)"/><path d="' + cone(cx, apex, base, hw) + '" fill="url(#cylRoof)"/></g></g>' +
+    '<path d="M' + cx + ' ' + (apex + 4) + 'V' + (apex - 46) + '" stroke="#5a3a24" stroke-width="3.4" stroke-linecap="round"/>' +
+    '<g filter="url(#drop)"><path d="M' + (cx + 2) + ' ' + (apex - 46) + 'c14 -5 22 5 36 0c-6 7 -6 13 0 20c-14 5 -22 -5 -36 0Z" fill="' + flag + '" filter="url(#claySmall)"/><circle cx="' + cx + '" cy="' + (apex - 48) + '" r="5" fill="#e3b85a" filter="url(#claySmall)"/></g>';
+}
+function merlons(x0, x1, top, h, w, gap) {
+  var d = 'M' + x0 + ' ' + (top + h + 4) + 'V' + top, x = x0;
+  while (x + w <= x1 + 0.5) { d += 'H' + (x + w); x += w + gap; if (x + w <= x1 + 0.5) d += 'V' + (top + h) + 'H' + x + 'V' + top; else d += 'V' + (top + h); }
+  return d + 'H' + x1 + 'V' + (top + h + 4) + 'Z';
+}
+function body(x, y, w, h, round) {
+  return '<g filter="url(#drop)"><g filter="url(#clay)"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="6" fill="url(#stones)"/>' + (round ? '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="url(#cyl)"/>' : '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="#6a4a30" opacity=".06"/>') + '</g></g>';
+}
+function ring(x0, x1, y) { return '<g filter="url(#drop)"><rect x="' + x0 + '" y="' + y + '" width="' + (x1 - x0) + '" height="22" rx="9" fill="#efdfc4" filter="url(#clay)"/></g>'; }
+function windowFrame(b, door) {                         /* stone surround + dark recess the shutters cover */
+  var x = b[0], y = b[1], w = b[2], h = b[3], r = w / 2, m = door ? 12 : 9;
+  var arch = function (x, y, w, h) { return 'M' + x + ' ' + (y + h) + 'V' + (y + w / 2) + 'a' + w / 2 + ' ' + w / 2 + ' 0 0 1 ' + w + ' 0V' + (y + h) + 'Z'; };
+  return '<circle cx="' + (x + w / 2) + '" cy="' + (y + h * 0.55) + '" r="' + (w * 1.15) + '" fill="url(#glowWin)"/>' +
+    '<g filter="url(#drop)"><path d="' + arch(x - m, y - m, w + 2 * m, h + m + (door ? 0 : 6)) + '" fill="#f1e2c8" filter="url(#claySmall)"/></g>' +
+    '<path d="' + arch(x - 2, y - 2, w + 4, h + 2) + '" fill="#2c1a10"/>' +
+    (door ? '' : '<rect x="' + (x - m - 4) + '" y="' + (y + h) + '" width="' + (w + 2 * m + 8) + '" height="9" rx="4" fill="#efe0c4" filter="url(#claySmall)"/>');
+}
+function slit(x, y) { return '<rect x="' + (x - 5) + '" y="' + y + '" width="10" height="34" rx="5" fill="#ffc463"/><rect x="' + (x - 22) + '" y="' + (y - 14) + '" width="44" height="62" fill="url(#glowWin)"/>'; }
+function vine(d) { return '<path d="' + d + '" fill="none" stroke="#4f6b3a" stroke-width="4.5" stroke-linecap="round" filter="url(#claySmall)"/>'; }
+function leaf(x, y, a, s) { return '<ellipse cx="' + x + '" cy="' + y + '" rx="' + 7 * s + '" ry="' + 3.6 * s + '" transform="rotate(' + a + ' ' + x + ' ' + y + ')" fill="#6b8c4a" filter="url(#claySmall)"/>'; }
+function rose(x, y, s) { return '<g filter="url(#drop)"><circle cx="' + x + '" cy="' + y + '" r="' + 7 * s + '" fill="#e7a5a8" filter="url(#claySmall)"/><path d="M' + (x - 3 * s) + ' ' + y + 'a' + 3 * s + ' ' + 3 * s + ' 0 1 1 ' + 4 * s + ' ' + 2 * s + '" fill="none" stroke="#b86c72" stroke-width="' + 1.6 * s + '"/></g>'; }
+
+var C = '<g id="L-castle">';
+/* back: keep */
+C += body(515, 262, 170, 510, true) + ring(503, 697, 248) + roof(600, 70, 252, 104, '#e2b4b4');
+/* keep turret */
+C += body(683, 330, 36, 74, true) + '<g filter="url(#drop)"><path d="M681 404h40l-20 26Z" fill="#e8d6b8" filter="url(#claySmall)"/></g>' + roof(701, 262, 334, 28, '#e0a2a6');
+/* towers */
+[[360, 290, 430], [840, 770, 910]].forEach(function (t) {
+  C += body(t[1], 400, 140, 372, true) + ring(t[1] - 12, t[2] + 12, 386) + roof(t[0], 214, 392, 94, t[0] < 600 ? '#f0cf7e' : '#e2b4b4');
+});
+/* little turret on the left tower */
+C += body(236, 530, 50, 90, true) + '<g filter="url(#drop)"><path d="M234 620h54l-27 34Z" fill="#e8d6b8" filter="url(#claySmall)"/></g>' + roof(261, 452, 534, 36, '#f0cf7e');
+/* wall + crenels */
+C += '<g filter="url(#drop)"><g filter="url(#clay)"><path d="' + merlons(430, 770, 532, 30, 30, 18) + '" fill="url(#stones)"/><rect x="430" y="560" width="340" height="214" fill="url(#stones)"/><rect x="430" y="560" width="340" height="214" fill="#6a4a30" opacity=".08"/></g></g>';
+/* gatehouse */
+C += '<g filter="url(#drop)"><g filter="url(#clay)"><path d="' + merlons(530, 670, 478, 26, 22, 14) + '" fill="url(#stones)"/><rect x="530" y="500" width="140" height="276" fill="url(#stones)"/><rect x="530" y="500" width="140" height="276" fill="#fff" opacity=".06"/></g></g>';
+/* arrow slits */
+C += slit(360, 640) + slit(840, 640) + slit(600, 418) + slit(261, 566);
+/* windows and door surrounds */
+WIN.forEach(function (b) { C += windowFrame(b, false); });
+C += '<rect x="' + (DOOR[0] - 60) + '" y="' + (DOOR[1] + 20) + '" width="' + (DOOR[2] + 120) + '" height="160" fill="url(#glowWin)"/>' + windowFrame(DOOR, true);
+/* step under the door */
+C += '<g filter="url(#drop)"><rect x="548" y="768" width="104" height="14" rx="6" fill="#d9c6a4" filter="url(#claySmall)"/></g>';
+/* vines and roses */
+C += '<g filter="url(#drop)">' + vine('M300 772C292 720 318 690 304 650S286 590 310 560') + vine('M300 700C330 690 340 664 372 668') + vine('M436 772C446 730 430 700 452 676S500 640 522 652') + vine('M672 772c10-40 30-60 22-96') + '</g>';
+var LV = [[298, 740, -30], [310, 712, 40], [296, 676, -20], [314, 640, 30], [300, 604, -40], [312, 572, 20], [336, 680, 60], [360, 664, -10], [442, 744, 30], [434, 712, -40], [448, 684, 20], [470, 664, -30], [500, 650, 40], [676, 748, -20], [690, 720, 30], [694, 692, -30]];
+LV.forEach(function (l) { C += leaf(l[0], l[1], l[2], 1.1); });
+[[304, 690, 1.1], [318, 600, 0.9], [366, 668, 1], [440, 726, 1.1], [486, 652, 0.9], [520, 652, 1], [688, 736, 1], [692, 700, 0.85]].forEach(function (r) { C += rose(r[0], r[1], r[2]); });
+C += '</g>';
+out += C;
+
+/* ── front: the mound, the path, grass, mushrooms ── */
+var F = '<g id="L-front">';
+F += '<g filter="url(#dropBig)"><path d="M-30 900V790C120 762 300 772 420 770S640 764 760 770 1040 760 1230 786V900Z" fill="#87a35f" filter="url(#clayHill)"/></g>';
+/* winding path */
+F += '<g filter="url(#dropSoft)"><path d="M570 778C560 810 610 826 586 852S520 880 530 904H660C650 880 690 860 668 840S628 806 632 778Z" fill="#dcc6a0" filter="url(#claySoft)"/></g>';
+var P = rnd(5);
+for (var k = 0; k < 26; k++) { var t = k / 26, px = 600 + Math.sin(t * 5) * 30 + (P() - 0.5) * 40, py = 784 + t * 116; F += '<ellipse cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" rx="' + (6 + P() * 6).toFixed(1) + '" ry="' + (3.5 + P() * 3).toFixed(1) + '" fill="' + (P() > 0.5 ? '#c4ab86' : '#ead8b6') + '" filter="url(#claySmall)"/>'; }
+/* grass tufts */
+var G = rnd(9);
+function tuft(x, y, s) { var d = ''; for (var b = 0; b < 7; b++) { var a = (b - 3) * 0.26 + (G() - 0.5) * 0.25, l = (12 + G() * 14) * s, bx = x + (b - 3) * 3.4 * s; d += 'M' + (bx - 2.6 * s) + ' ' + y + 'Q' + (bx + Math.sin(a) * l * 0.3) + ' ' + (y - l * 0.6) + ' ' + (bx + Math.sin(a) * l) + ' ' + (y - l) + 'Q' + (bx + Math.sin(a) * l * 0.3 + 2.5 * s) + ' ' + (y - l * 0.55) + ' ' + (bx + 2.6 * s) + ' ' + y + 'Z'; } return '<path d="' + d + '" fill="' + (G() > 0.5 ? '#5f7f40' : '#71944c') + '" filter="url(#claySmall)"/>' + (G() > 0.6 ? '<circle cx="' + (x + 6 * s) + '" cy="' + (y - 16 * s) + '" r="' + 3.2 * s + '" fill="' + (G() > 0.5 ? '#f3e7c4' : '#e9a9b0') + '" filter="url(#claySmall)"/>' : ''); }
+F += '<g filter="url(#drop)">';
+[[250, 790], [292, 786], [330, 782], [380, 788], [420, 784], [480, 790], [520, 786], [680, 788], [720, 786], [790, 782], [840, 788], [880, 790], [920, 784], [960, 778], [60, 820], [100, 836], [150, 850], [1000, 840], [1060, 830], [1110, 820], [1160, 846], [420, 870], [360, 846], [820, 852], [760, 880], [300, 892], [900, 896], [40, 884], [1140, 890], [200, 806]].forEach(function (p) { F += tuft(p[0], p[1], 1 + G() * 0.5); });
+F += '</g>';
+/* mushrooms */
+function shroom(x, y, s) { return '<g filter="url(#drop)"><rect x="' + (x - 4 * s) + '" y="' + (y - 16 * s) + '" width="' + 8 * s + '" height="' + 16 * s + '" rx="' + 3 * s + '" fill="#f1e4cc" filter="url(#claySmall)"/><path d="M' + (x - 14 * s) + ' ' + (y - 14 * s) + 'a' + 14 * s + ' ' + 11 * s + ' 0 0 1 ' + 28 * s + ' 0Z" fill="#c95b52" filter="url(#claySmall)"/><circle cx="' + (x - 4 * s) + '" cy="' + (y - 20 * s) + '" r="' + 2 * s + '" fill="#fbeedd"/><circle cx="' + (x + 5 * s) + '" cy="' + (y - 18 * s) + '" r="' + 1.6 * s + '" fill="#fbeedd"/></g>'; }
+F += shroom(214, 834, 1.2) + shroom(236, 842, 0.8) + shroom(1010, 874, 1.1) + shroom(470, 858, 0.9);
+/* a tiny lantern by the path */
+F += '<path d="M700 856V808" stroke="#3b2a1e" stroke-width="4" stroke-linecap="round"/><g filter="url(#drop)"><rect x="690" y="788" width="20" height="24" rx="4" fill="#3b2a1e" filter="url(#claySmall)"/></g><rect x="694" y="793" width="12" height="14" rx="3" fill="#ffd27a"/><circle cx="700" cy="800" r="34" fill="url(#glowWin)"/>';
+F += '</g>';
+out += F;
+/* overall light */
+out += '<g id="L-light"><rect width="1200" height="900" fill="url(#key)"/><rect width="1200" height="900" fill="url(#vig)"/></g>';
+
+document.getElementById('s').innerHTML = '<defs>' + defs + '</defs>' + out;
+window.SCENE = { win: WIN, door: DOOR, w: 1200, h: 900 };
+</script>
