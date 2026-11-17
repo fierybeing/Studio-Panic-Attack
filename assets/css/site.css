@@ -191,6 +191,13 @@ body[data-view="projects"] .view { height: 100vh; height: 100dvh; overflow: hidd
 }
 @keyframes rise { from { opacity: 0; transform: translate(14px, -50%); } }
 .orbit__caption[hidden] { display: none; }
+/* the black X that closes the focused image */
+.orbit__close { position: absolute; top: 4px; right: 8px; width: 38px; height: 38px; transition: transform 0.3s var(--ease); }
+.orbit__close::before, .orbit__close::after { content: ''; position: absolute; left: 4px; right: 4px; top: 50%; height: 2px; margin-top: -1px; background: var(--ink); transition: background 0.2s; }
+.orbit__close::before { transform: rotate(45deg); }
+.orbit__close::after { transform: rotate(-45deg); }
+.orbit__close:hover { transform: rotate(90deg); }
+.orbit__close:hover::before, .orbit__close:hover::after { background: var(--ultra); }
 .orbit__caption .meta { margin-bottom: 12px; }
 .orbit__title { font-size: clamp(24px, 2.6vw, 38px); font-weight: 650; line-height: 1.04; letter-spacing: -0.01em; text-transform: none; }
 .orbit__cat { margin-top: 12px; padding-bottom: 18px; border-bottom: 1px solid var(--ink); font-size: 12px; letter-spacing: 0.06em; color: var(--soft); }
@@ -728,7 +735,8 @@ body[data-view="contact"] .view { overflow-x: clip; }      /* the tilted note mu
   .orbit__item.is-selected { left: 50%; top: 32%; width: 64vw !important; }
   .orbit__item.is-selected .orbit__pic, .orbit__item.is-selected .orbit__pic img { max-height: 42vh; }
   .orbit__caption { left: 16px; right: 16px; top: auto; bottom: 56px; width: auto; transform: none; margin: 0; padding: 12px 0 0; box-shadow: 0 -16px 20px rgba(255, 255, 255, 0.95); animation: none; }
-  .orbit__title { font-size: 22px; }
+  .orbit__title { font-size: 22px; padding-right: 40px; }
+  .orbit__close { top: 4px; right: -6px; }
   .orbit__caption .meta { margin-bottom: 6px; }
   .orbit__cat { margin-top: 6px; padding-bottom: 10px; }
   .orbit__desc { margin-top: 10px; }

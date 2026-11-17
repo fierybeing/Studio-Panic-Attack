@@ -31,7 +31,8 @@ window.SPA_CONTENT = {
     { label: 'Home', route: '' },
     { label: 'Projects', route: 'projects' },
     { label: 'Highlights', route: 'highlights' },
-    { label: 'Vocabulary', route: 'vocabulary' },
+    { label: 'Random', route: 'random' },
+    { label: 'Shop', route: 'shop' },
     { label: 'About', route: 'about' },
     { label: 'Contact', route: 'contact' }
   ],
@@ -552,6 +553,104 @@ window.SPA_CONTENT = {
       { letter: 'C', word: 'Curiosity', img: 'vocab/letter-c', def: 'Built into every project as a mechanic. Hide a match in a box. Put a question on a card. Let people unlock the next bit themselves.' }
     ],
     outro: 'More entries coming. The dictionary keeps growing — just like the practice.'
+  },
+
+  /* ── RANDOM: five small toys ──────────────────────────────────────────────
+     The list below is the Random page. "slug" is the address (#/random/<slug>)
+     and must stay as it is; titles, kinds and texts are yours to change.
+     Vocabulary (project 01) keeps its own block just above.                   */
+  random: {
+    title: 'Random',
+    intro: 'Side quests. Small toys and half-serious experiments that don’t fit in a folder. Poke at them.',
+    projects: [
+      { slug: 'vocabulary', title: 'Vocabulary', kind: 'A small dictionary', text: 'The words and shapes that keep coming back in my work.' },
+      { slug: 'cards', title: 'Curiosity cards', kind: 'Card game', text: 'Draw a question, talk it through, earn a match, light the candle.' },
+      { slug: 'dress-up', title: 'Dress-up', kind: 'Paper doll', text: 'A model and a sheet of clothes to pull over them.' },
+      { slug: 'castle', title: 'Cardboard castle', kind: 'Open the windows', text: 'Behind every window and the door: something I like.' },
+      { slug: 'shadowrealm', title: 'Shadowrealm', kind: 'Shadow theatre', text: 'A tent with a small stop-motion shadow play inside.' }
+    ],
+
+    /* 02 — the two decks from the Curiosity room. Add, remove or rewrite questions freely. */
+    cards: {
+      intro: 'From the Curiosity room: two decks, an unlit candle and a matchbox with no matches. Draw a card and talk it through. Once the question has landed, the box gives up its match.',
+      decks: [
+        { name: 'Light', questions: [
+          'What did you make as a kid that you were secretly proud of?',
+          'Which object in your home would you rescue first?',
+          'What smell takes you straight back somewhere?',
+          'What is the best thing you ever found by accident?',
+          'If today was a colour, what would it be painted on?',
+          'Which song should play when you walk into a room?',
+          'What are you weirdly good at?',
+          'What would you build if cardboard was the only material left?',
+          'Who taught you something without knowing they did?',
+          'What small thing made you laugh this week?'
+        ] },
+        { name: 'Provocative', questions: [
+          'What do you pretend to like?',
+          'When did you last change your mind about something big?',
+          'What are you avoiding right now?',
+          'Which rule do you break on purpose?',
+          'What would you make if nobody ever saw it?',
+          'What are you jealous of, honestly?',
+          'What do people get wrong about you?',
+          'What did you give up on too early?',
+          'What would you say if it wasn’t going to be awkward?',
+          'What scares you about getting what you want?'
+        ] }
+      ],
+      done: 'Curiosity unlocks something.'
+    },
+
+    /* 03 — the paper doll. The clothes themselves are drawn in assets/js/random.js. */
+    dressup: {
+      intro: 'One model, one sheet of clothes. Drag a piece onto the model to put it on; drag it off, or click it, to take it off.'
+    },
+
+    /* 04 — what is behind each window. "img" is optional (a picture from the site);
+       without it the room just shows the words. The last entry is the door.      */
+    castle: {
+      intro: 'A castle made of boxes. Click the windows and the door: each one opens onto something I like.',
+      rooms: [
+        { label: 'Film cameras', note: 'An Olympus, a roll of film and whatever happens in front of it.', img: 'photo/000008390034-33a-copy-2' },
+        { label: 'The Sims', note: 'World’s biggest fan. Sims 2, 3 and 4, with far too much custom content.' },
+        { label: 'Chrome type', note: 'Letters that look like liquid metal.', img: 'hl/chrome-type-bw-4' },
+        { label: 'Treasure hunts', note: 'Clues, QR codes and a spirit to follow through a real place.', img: 'ev/treasure-hunt' },
+        { label: 'This cat', note: 'No further comment.', img: 'photo/aa020a' },
+        { label: 'Festival posters', note: 'Gravröset, the festival I co-organise, and everything printed for it.', img: 'gd/pegasus' },
+        { label: 'Hi! I’m Ema', note: 'You found the door. Come in.', img: 'about/hi-trim', link: '#/about', linkLabel: 'About me' }
+      ]
+    },
+
+    /* 05 — the shadow play. The acts are drawn in assets/js/random.js. */
+    shadow: {
+      intro: 'Pull the curtain. Inside the tent a small shadow play runs on a loop, cut from paper and moved one frame at a time. Move the lamp with your cursor.',
+      acts: ['The fair', 'The forest', 'The sea']
+    }
+  },
+
+  /* ── SHOP ─────────────────────────────────────────────────────────────────
+     Every product is one line. "price" is a plain number in the currency below.
+     "status" is the little taped note at the top: delete the text to hide it.
+     Nothing is paid for on the site: "Send order request" opens the Contact
+     form with the basket written into the message.                            */
+  shop: {
+    title: 'Shop',
+    intro: 'Prints, posters and small things. Grab one and drop it in the basket.',
+    status: 'Opening soon · sample items',
+    currency: '€',
+    note: 'No payment happens here. Sending the basket writes me a message, and I reply with availability, shipping and how to pay.',
+    products: [
+      { id: 'pegasus', title: 'Pegasus', kind: 'Poster', size: 'A2 · 420 × 594 mm', price: 30, img: 'gd/pegasus', text: 'Lineup poster for Gravröset 2025.' },
+      { id: 'easy-living', title: 'Easy Living', kind: 'Poster', size: 'A2 · 420 × 594 mm', price: 30, img: 'gd/img-3330', text: 'Red flowers on yellow, set in blackletter.' },
+      { id: 'error-500', title: 'Internal Error 500', kind: 'Poster', size: 'A2 · 420 × 594 mm', price: 30, img: 'gd/glasserrorscrnshot', text: 'Glass type over a server error.' },
+      { id: 'berlin', title: 'Berlin', kind: 'Art print', size: 'A3 · 297 × 420 mm', price: 22, img: 'gd/img-9247', text: 'Green hall, red letters.' },
+      { id: 'red-street', title: 'Red street', kind: 'Art print', size: 'A3 · 297 × 420 mm', price: 22, img: 'gd/img-4145', text: 'From the Pantone photo series.' },
+      { id: 'chrome-type', title: 'Chrome Type', kind: 'Art print', size: 'A3 · 420 × 297 mm', price: 22, img: 'hl/chrome-type-bw-4', text: 'Liquid-metal lettering, black and white.' },
+      { id: 'ant', title: 'Ant', kind: 'Art print', size: 'A4 · 297 × 210 mm', price: 15, img: 'da/img-4305', text: 'Digital drawing.' },
+      { id: 'holistic', title: 'Holistic Art Mag, vol. 0', kind: 'Zine', size: 'A5 · 24 pages', price: 12, img: 'hl/holistic-art-mag-vol-0-cover-page', text: 'The first issue.' },
+      { id: 'chaos', title: 'Chaos', kind: 'Sticker', size: '9 cm · die-cut', price: 4, img: 'da/img-2471', text: 'Die-cut vinyl.' }
+    ]
   },
 
   /* ── ABOUT ────────────────────────────────────────────────────────────── */

@@ -148,6 +148,9 @@
     (Array.isArray(it.text) ? it.text : (it.text ? [it.text] : [])).forEach(function (p) {
       body.appendChild(h('p.post__text', p));
     });
+    if (it.facts) body.appendChild(h('dl.facts.post__facts', it.facts.map(function (f) { return [h('dt', f[0]), h('dd', f[1])]; })));
+    if (it.action) body.appendChild(h('button.btn.btn--solid.post__action', { type: 'button',
+      onclick: function () { it.action.run(); SPA.closePost(); } }, it.action.label));
     var many = post.items.length > 1;
     post.el.classList.toggle('is-single', !many);
     post.el.querySelector('.post__count').textContent = SPA.pad(post.i + 1) + ' / ' + SPA.pad(post.items.length);
@@ -188,7 +191,7 @@
     var down = null;
     scroller.addEventListener('pointerdown', function (e) {
       if (e.pointerType !== 'mouse' || e.button !== 0) return;
-      if (e.target.closest('button, a, input, textarea, video')) return;
+      if (e.target.closest('button, a, input, textarea, video, [data-grab]')) return;
       down = { x: e.clientX, left: scroller.scrollLeft };
     });
     window.addEventListener('pointermove', function (e) {
@@ -202,6 +205,45 @@
       h('button.pager__btn', { type: 'button', 'aria-label': 'Scroll right', onclick: function () { step(1); } }, '→'));
   };
 
+  /* ── grab: one pointer-drag helper for everything you can pick up ──────
+     SPA.grab(el, { begin(e, dx, dy) -> false to refuse, move(e, dx, dy), end(e, cancelled), tap(e) }) */
+  SPA.grab = function (el, o) {
+    el.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      if (o.filter && !o.filter(e)) return;
+      var sx = e.clientX, sy = e.clientY, on = false, id = e.pointerId;
+      function stop() {
+        window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', done);
+        window.removeEventListener('pointercancel', done);
+      }
+      function mv(ev) {
+        if (ev.pointerId !== id) return;
+        var dx = ev.clientX - sx, dy = ev.clientY - sy;
+        if (!on) {
+          if (Math.abs(dx) + Math.abs(dy) < (o.slop || 6)) return;
+          if (o.begin && o.begin(ev, dx, dy) === false) { stop(); return; }
+          on = true;
+        }
+        if (ev.cancelable) ev.preventDefault();
+        if (o.move) o.move(ev, dx, dy);
+      }
+      function done(ev) {
+        if (ev.pointerId !== id) return;
+        stop();
+        if (on) {
+          /* swallow the click that follows a drag */
+          var eat = function (c) { c.stopPropagation(); c.preventDefault(); };
+          window.addEventListener('click', eat, true);
+          setTimeout(function () { window.removeEventListener('click', eat, true); }, 0);
+          if (o.end) o.end(ev, ev.type === 'pointercancel');
+        } else if (ev.type === 'pointerup' && o.tap) o.tap(ev);
+      }
+      window.addEventListener('pointermove', mv, { passive: false });
+      window.addEventListener('pointerup', done);
+      window.addEventListener('pointercancel', done);
+    });
+  };
+
   /* ── router ──────────────────────────────────────────────────────────── */
   var cleanup = null;
   SPA.onLeave = function (fn) { var prev = cleanup; cleanup = function () { if (prev) prev(); fn(); }; };
@@ -211,6 +253,10 @@
   }
   function render() {
     var parts = parseHash();
+    if (parts[0] === 'vocabulary') {                  /* the old address of the dictionary */
+      parts = ['random', 'vocabulary'];
+      history.replaceState(null, '', '#/random/vocabulary');
+    }
     var name = parts[0] || 'home';
     var view = SPA.views[name] || SPA.views.home;
     if (!SPA.views[name]) name = 'home';
@@ -229,7 +275,8 @@
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     document.body.classList.remove('nav-open');
-    var label = { home: '', projects: 'Projects', highlights: 'Highlights', vocabulary: 'Vocabulary', about: 'About', contact: 'Contact' }[name];
+    var label = { home: '', projects: 'Projects', highlights: 'Highlights', random: 'Random', shop: 'Shop', about: 'About', contact: 'Contact' }[name];
+    if (name === 'random' && parts[1]) (C.random.projects || []).forEach(function (p) { if (p.slug === parts[1]) label = p.title + ' — Random'; });
     document.title = (label ? label + ' — ' : '') + C.site.name;
   }
 
@@ -247,6 +294,7 @@
   SPA.start = function () {
     buildHeader();
     if (SPA.fx) SPA.fx.cursor();
+    if (SPA.basket) SPA.basket.badge();
     window.addEventListener('hashchange', render);
     render();
   };

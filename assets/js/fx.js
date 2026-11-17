@@ -416,7 +416,7 @@
       el.classList.add('is-on');
       var t = e.target.closest ? e.target : document.body;
       el.classList.toggle('is-text', !!t.closest('input, textarea'));
-      el.classList.toggle('is-over', !!t.closest('a, button, .knot, video'));
+      el.classList.toggle('is-over', !!t.closest('a, button, .knot, video, [role="button"], [data-grab], .match'));
     });
     window.addEventListener('pointerdown', function () { el.classList.add('is-down'); });
     window.addEventListener('pointerup', function () { el.classList.remove('is-down'); });

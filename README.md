@@ -21,11 +21,18 @@ Built from three sources:
 | `#/projects` | Ten folders on a desk, with the index on the left |
 | `#/projects/events` … `#/projects/marketing` | The ten categories, each with its own layout |
 | `#/highlights` | Padlet-style columns of taped photo stacks |
-| `#/vocabulary` | The A–Z dictionary (A, B, C so far) |
+| `#/random` | Five small toys: loose cut-outs you can push around, and a numbered list |
+| `#/random/vocabulary` | 01 Vocabulary: the A–Z dictionary (A, B, C so far). The old `#/vocabulary` address still lands here. |
+| `#/random/cards` | 02 Curiosity cards: two decks, a matchbox and a candle |
+| `#/random/dress-up` | 03 Dress-up: a paper doll and a sheet of clothes to drag onto it |
+| `#/random/castle` | 04 Cardboard castle: six windows and a door that open onto things you like |
+| `#/random/shadowrealm` | 05 Shadowrealm: a tent with a stop-motion shadow play in three acts |
+| `#/shop` | Shop: a shelf of products that scrolls sideways and a basket to drop them in |
 | `#/about` | Dark opening with the portrait (letters scatter from the cursor, embers drift toward it), then disciplines, places, the knife text loop and the film strip |
 | `#/contact` | Post-it contact form |
 
-Click any picture to open it in the viewer (← → to browse, Esc to close).
+Click any picture to open it in the viewer (← → to browse, Esc to close). On the
+home sphere, a focused picture closes with its black X, a click anywhere outside it, or Esc.
 
 ## Editing content: one file
 
@@ -39,6 +46,37 @@ CV link. You never need to touch the other files.
   it into `site.web3formsKey`. Without a key, Send opens the visitor's mail app.
 - **Images** are referenced by keys like `'gd/pegasus'`, meaning
   `media/gd/pegasus.webp` (large) and `media/gd/pegasus.t.webp` (thumbnail).
+
+## The Random page
+
+In `content.js`, under `random`:
+
+- `projects`: the five entries (title, kind, one-line text). Keep each `slug` as it is.
+- `cards.decks`: the questions in the two decks. Add, remove or rewrite freely.
+- `castle.rooms`: what is behind the six windows, in order, and last the door. Each
+  has a `label`, a `note` and optionally an `img` key and a `link`.
+- `shadow.acts`: the names of the three acts.
+- `vocabulary` (its own block just above `random`) holds the dictionary entries.
+
+The drawings themselves (doll, clothes, castle, tent, the shadow puppets) are made
+in code in `assets/js/random.js`. To add a piece of clothing, copy one entry in the
+`GARMENTS` list there: a name, a slot (pieces in the same slot swap), a layer, the
+box it fills and its shapes, all in the doll's own 300 × 700 units.
+
+## The Shop
+
+In `content.js`, under `shop`:
+
+- `products`: one line per product: `id`, `title`, `kind`, `size`, `price` (a plain
+  number), `img` (an image key) and a short `text`.
+- `currency`: the sign shown before every price.
+- `status`: the taped note beside the title ("Opening soon · sample items"). Empty it to hide it.
+- `note`: the small print under the basket.
+
+**Nothing is paid for on the site.** "Send order request" opens the Contact form with
+the basket written into the message, so an order reaches you like any other message.
+The products and prices that ship with the site are samples made from existing work:
+replace them before you announce the shop.
 
 ## The landing page sections
 
@@ -120,14 +158,17 @@ Import the repo. `vercel.json` already says "no build, serve the folder as-is".
 ```
 index.html              the one HTML page
 assets/css/site.css     all styling
+assets/css/play.css     styling for the Shop and the Random toys
 assets/js/content.js    ← all text + image lists (edit this)
 assets/js/core.js       helpers, viewer, router
 assets/js/fx.js         everything that moves: grid floor, flying pictures, knot, scattering letters, embers
 assets/js/projects.js   Projects page + the ten category layouts
 assets/js/pages.js      Home, Highlights, Vocabulary, About, Contact
+assets/js/random.js     the Random page and its toys (cards, dress-up, castle, shadow play)
+assets/js/shop.js       the Shop: shelf, basket, order request
 assets/js/media.js      auto-generated image sizes (don't edit)
 assets/js/knife.js      Swiss-knife outline for the text loop
-assets/fonts/           Geist Mono (SIL Open Font License)
+assets/fonts/           Geist Mono, Courier Prime, Quiet Attempt
 media/                  optimised images (.webp) and videos (.mp4)
 media/fx/               effect versions of the flying pictures (made by tools/make_fx.py)
 tools/                  scripts: add images, bake effects, check keys, rebuild media; the Figma cut-outs

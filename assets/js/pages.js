@@ -1,6 +1,6 @@
 /* ════════════════════════════════════════════════════════════════════════
    pages.js — Home (orbiting works), Highlights (pin-board of photo stacks),
-   Vocabulary, About and Contact.
+   the Vocabulary dictionary, About and Contact.
    ════════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -143,6 +143,8 @@
         var im = nodes[i].querySelector('img'); im.src = SPA.src(w.img, false);
         var href = '#/projects/' + (w.link || '');
         caption.textContent = '';
+        caption.appendChild(h('button.orbit__close', { type: 'button', 'aria-label': 'Close this image',
+          onclick: function (e) { e.stopPropagation(); pick(-1); } }));
         caption.appendChild(h('p.meta', pad(i + 1) + ' / ' + pad(works.length)));
         caption.appendChild(h('h2.orbit__title', w.title));
         caption.appendChild(h('p.orbit__cat', [w.category, w.year].filter(Boolean).join(' · ')));
@@ -152,7 +154,7 @@
         crumb.appendChild(h('a', { href: '#/projects' }, 'Projects'));
         crumb.appendChild(document.createTextNode(' / '));
         crumb.appendChild(h('a', { href: href }, catTitle(w.link)));
-        status.textContent = 'Click the image again or press esc to release';
+        status.textContent = 'Click outside, the X or press esc to close';
         if (window.scrollY > 40) window.scrollTo({ top: 0, behavior: 'smooth' });
       } else status.textContent = 'Select an image to focus · drag any way to spin';
       layout();
@@ -236,6 +238,13 @@
         e.preventDefault();
         window.scrollTo({ top: el.offsetHeight * 0.92, behavior: reduce ? 'auto' : 'smooth' });
       } }, 'Scroll ', h('span', { 'aria-hidden': 'true' }, '↓')));
+    /* with a picture open, a click anywhere outside it and its description closes it */
+    el.addEventListener('click', function (e) {
+      if (selected < 0 || dragged) return;
+      if (nodes[selected].contains(e.target) || caption.contains(e.target) || crumb.contains(e.target)) return;
+      e.stopPropagation(); e.preventDefault();
+      pick(-1);
+    }, true);
     requestAnimationFrame(function () { layout(); if (!reduce) raf = requestAnimationFrame(tick); });
     return el;
   }
@@ -271,12 +280,12 @@
       rail, SPA.sideways(rail));
   };
 
-  /* ── VOCABULARY ──────────────────────────────────────────────────────── */
-  SPA.views.vocabulary = function () {
+  /* ── VOCABULARY — now project 01 on the Random page (see random.js) ──── */
+  SPA.vocabulary = function () {
     var V = C.vocabulary;
     var items = V.entries.map(function (e) { return { img: e.img, title: e.letter + ' — ' + e.word, category: 'Vocabulary', text: e.def }; });
     return h('div.page.vocab',
-      h('header.page__head', h('p.eyebrow', '— glossary —'), h('h1.page__title', V.title), h('p.lede', V.intro)),
+      h('header.page__head', h('p.eyebrow', '— 01 / glossary —'), h('h1.page__title', V.title), h('p.lede', V.intro)),
       V.entries.map(function (e, i) {
         return h('article.entry' + (i % 2 ? '.entry--flip' : ''),
           h('div.entry__letter', { 'aria-hidden': 'true' }, e.letter),
@@ -389,6 +398,13 @@
       field('Message', 'message', 'textarea', true),
       h('div.postit__row', send, h('a', { href: 'mailto:' + S.email }, 'or just email me')),
       status);
+    if (SPA.draft) {                                   /* a basket sent over from the Shop */
+      form.elements.subject.value = SPA.draft.subject || '';
+      form.elements.message.value = SPA.draft.message || '';
+      form.elements.message.rows = Math.min(14, Math.max(5, (SPA.draft.message || '').split('\n').length + 1));
+      status.textContent = 'Your basket is in the message. Add your name and email, then send.';
+      SPA.draft = null;
+    }
 
     function submit(e) {
       e.preventDefault();
@@ -425,6 +441,7 @@
       footer());
   };
 
+  SPA.footer = footer;
   function footer() {
     return h('footer.foot', h('span', C.site.name + ' © ' + C.site.year), h('a', { href: 'mailto:' + C.site.email }, C.site.email));
   }
