@@ -54,21 +54,21 @@
 
       ctx.lineWidth = 0.4;                                       /* lines fanning from the horizon */
       for (j = -maxCols; j <= maxCols; j++) {
-        ctx.strokeStyle = 'rgba(175,178,192,' + ((1 - Math.abs(j) / maxCols * 0.55) * 0.2).toFixed(3) + ')';
+        ctx.strokeStyle = 'rgba(205,208,222,' + ((1 - Math.abs(j) / maxCols * 0.55) * 0.09).toFixed(3) + ')';
         ctx.beginPath(); ctx.moveTo(vx, vy); ctx.lineTo(vx + j * cell, H); ctx.stroke();
       }
       for (i = 0; i <= rows; i++) {
         var t = (i + row) / rows; if (t <= 0 || t > 1) continue;
         var te = Math.pow(t, EXPO), y = vy + span * te;
-        ctx.strokeStyle = 'rgba(175,178,192,' + (t * 0.44).toFixed(3) + ')';
+        ctx.strokeStyle = 'rgba(205,208,222,' + (t * 0.16).toFixed(3) + ')';
         ctx.lineWidth = 0.3 + t * 0.8;
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
         var s = 1.5 + t * 6.5, jmax = Math.min(maxCols, Math.ceil(cols / te));   /* the "+" marks */
         ctx.lineWidth = 0.6 + t * 0.9;
         for (j = -jmax; j <= jmax; j++) {
           var x = vx + j * cell * te; if (x < -s || x > W + s) continue;
-          var a = t * 0.68 * (1 - Math.abs(j) / jmax * 0.42); if (a < 0.025) continue;
-          ctx.strokeStyle = 'rgba(105,110,130,' + a.toFixed(3) + ')';
+          var a = Math.min(1, t * 1.15) * (1 - Math.abs(j) / jmax * 0.42); if (a < 0.03) continue;
+          ctx.strokeStyle = 'rgba(198,202,219,' + a.toFixed(3) + ')';   /* never darker than #C6CADB */
           ctx.beginPath(); ctx.moveTo(x - s, y); ctx.lineTo(x + s, y); ctx.moveTo(x, y - s); ctx.lineTo(x, y + s); ctx.stroke();
         }
       }
