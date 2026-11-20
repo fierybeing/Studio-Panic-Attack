@@ -158,6 +158,10 @@ branch of this repo. Every push to that branch goes live in about a minute, with
 build step. Email stays on Hostinger: the MX, SPF, DKIM and DMARC records in Cloudflare
 DNS are untouched.
 
+**After changing CSS or JS:** browsers keep those files for up to 4 hours. Bump the
+`?v=…` number on the `<link>` and `<script>` lines in `index.html` (any new value) so
+visitors get the new version straight away.
+
 ## Publish on Cloudflare Pages (your own domain)
 
 1. Cloudflare dashboard → **Workers & Pages → Create → Pages**.
